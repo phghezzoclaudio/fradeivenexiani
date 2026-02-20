@@ -1,53 +1,42 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 const slides = [
   "/images/hero/venice-1.jpg",
   "/images/hero/venice-2.jpg",
-  
+  "/images/hero/venice-3.jpg",
+  "/images/hero/venice-4.jpg",
+  "/images/hero/venice-5.jpg",
 ];
 
-export default function Hero() {
+export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
-  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (paused) return;
-
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
-    }, 6000);
+    }, 5500);
 
     return () => clearInterval(interval);
-  }, [paused]);
+  }, []);
 
   return (
-    <section
-      className="relative h-screen w-full overflow-hidden"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
+    <section className="relative h-screen w-full overflow-hidden">
       {/* Slides */}
       {slides.map((src, index) => (
-        <div
+        <Image
           key={src}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            index === current ? "opacity-100 z-10" : "opacity-0"
+          src={src}
+          alt="Venezia"
+          fill
+          priority={index === 0}
+          className={`object-cover transition-opacity duration-1000 ${
+            index === current ? "opacity-100" : "opacity-0"
           }`}
-        >
-          <Image
-            src={src}
-            alt="Venezia"
-            fill
-            priority={index === 0}
-            className={`object-cover scale-105 transition-transform duration-[7000ms] ${
-              index === current ? "scale-110" : "scale-105"
-            }`}
-          />
-        </div>
+        />
       ))}
 
       {/* Overlay cinematic */}
