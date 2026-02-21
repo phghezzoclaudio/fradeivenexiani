@@ -7,16 +7,18 @@ export function getGTFSIndex() {
 
   console.log("⚡ Building GTFS index...");
 
-  const { stops, trips, stop_times, routes } = loadGTFS();
+  const { stops, trips, stopTimes, routes } = loadGTFS();
 
   const stopsById = new Map();
   const tripsById = new Map();
 
+  // indicizza fermate
   stops.forEach((s: any) => {
     stopsById.set(s.stop_id, s);
   });
 
-  stop_times.forEach((st: any) => {
+  // indicizza stopTimes per trip
+  stopTimes.forEach((st: any) => {
     if (!tripsById.has(st.trip_id)) {
       tripsById.set(st.trip_id, []);
     }
