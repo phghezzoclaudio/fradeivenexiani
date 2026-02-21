@@ -1,7 +1,7 @@
 import path from "path";
-import fs from "fs";
 import Papa from "papaparse";
 import AdmZip from "adm-zip";
+import type { Stop, StopTime } from "./types";
 
 let zipCache: AdmZip | null = null;
 
@@ -13,7 +13,7 @@ function getZip() {
   return zipCache;
 }
 
-function loadCSVFromZip(fileName: string) {
+function loadCSVFromZip<T>(fileName: string): T[] {
   const zip = getZip();
   const entry = zip.getEntry(fileName);
 
@@ -23,7 +23,7 @@ function loadCSVFromZip(fileName: string) {
 
   const content = entry.getData().toString("utf8");
 
-  const parsed = Papa.parse(content, {
+  const parsed = Papa.parse<T>(content, {
     header: true,
     skipEmptyLines: true,
   });
@@ -33,10 +33,10 @@ function loadCSVFromZip(fileName: string) {
 
 export function loadGTFS() {
   return {
-    stops: loadCSVFromZip("stops.txt"),
-    routes: loadCSVFromZip("routes.txt"),
-    trips: loadCSVFromZip("trips.txt"),
-    stopTimes: loadCSVFromZip("stop_times.txt"),
-    shapes: loadCSVFromZip("shapes.txt"),
+    stops: loadCSVFromZip<Stop>("stops.txt"),
+    stopTimes: loadCSVFromZip<StopTime>("stop_times.txt"),
+    trips: loadCSVFromZip<any>("trips.txt"),
+    routes: loadCSVFromZip<any>("routes.txt"),
+    shapes: loadCSVFromZip<any>("shapes.txt"),
   };
 }
