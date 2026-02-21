@@ -54,3 +54,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, Arial, Helvetica, sans-serif;
 }
+
+/*==================== LEAFLET MAP ================= */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
