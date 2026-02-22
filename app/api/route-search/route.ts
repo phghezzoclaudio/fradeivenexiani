@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { findDirectRoute } from "@/features/gtfs/search";
+import { findDirectRoute } from "@/features/gtfs/searchRoute";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
