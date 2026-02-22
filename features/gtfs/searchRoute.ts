@@ -1,63 +1,75 @@
-import { getGTFSIndex } from "./index";
+import { getGTFSIndex, getRomeNow, timeToSeconds } from "./index";
+import { getValidServiceIds } from "./calendar";
 
-interface Result {
-  tripId: string;
-  routeId: string;
-  stopsBetween: any[];
-  duration: number;
-}
+export async function findDirectRoute(from: string, to: string) {
+  const {
+    stopsById,
+    tripsById,
+    trips,
+    routes,
+    calendar,
+    calendarDates,
+  } = await getGTFSIndex();
 
-export function findDirectRoute(fromName: string, toName: string): Result | null {
-  const { stopsById, tripsById, tripsRaw, routesRaw } = getGTFSIndex();
+  const validServices = getValidServiceIds(calendar, calendarDates);
+  const nowSeconds =
+    getRomeNow().hour * 3600 +
+    getRomeNow().minute * 60 +
+    getRomeNow().second;
 
   const fromStops: string[] = [];
   const toStops: string[] = [];
 
   stopsById.forEach((stop: any) => {
-    if (stop.stop_name.toLowerCase().includes(fromName.toLowerCase())) {
+    if (stop.stop_name.toLowerCase().includes(from.toLowerCase()))
       fromStops.push(stop.stop_id);
-    }
-    if (stop.stop_name.toLowerCase().includes(toName.toLowerCase())) {
+    if (stop.stop_name.toLowerCase().includes(to.toLowerCase()))
       toStops.push(stop.stop_id);
-    }
   });
 
+  const results: any[] = [];
+
   for (const [tripId, stopTimes] of tripsById.entries()) {
-    const ordered = stopTimes.sort(
-      (a: any, b: any) => Number(a.stop_sequence) - Number(b.stop_sequence)
-    );
+    const trip = trips.find((t: any) => t.trip_id === tripId);
+    if (!trip || !validServices.has(trip.service_id)) continue;
+
+    const ordered = stopTimes
+      .slice()
+      .sort((a: any, b: any) => a.stop_sequence - b.stop_sequence);
 
     const fromIndex = ordered.findIndex((s: any) =>
       fromStops.includes(s.stop_id)
     );
-
     const toIndex = ordered.findIndex((s: any) =>
       toStops.includes(s.stop_id)
     );
 
-    if (fromIndex !== -1 && toIndex !== -1 && fromIndex < toIndex) {
-      const segment = ordered.slice(fromIndex, toIndex + 1);
+    if (fromIndex === -1 || toIndex === -1) continue;
 
-      const trip = tripsRaw.find((t: any) => t.trip_id === tripId);
-      const route = routesRaw.find((r: any) => r.route_id === trip.route_id);
+    // gestione circolare (wrap)
+    if (fromIndex > toIndex) continue;
 
-      const duration =
-        timeToMinutes(segment[segment.length - 1].arrival_time) -
-        timeToMinutes(segment[0].departure_time);
+    const departure = ordered[fromIndex].departure_time;
+    const arrival = ordered[toIndex].arrival_time;
 
-      return {
-        tripId,
-        routeId: route?.route_short_name || "N/D",
-        stopsBetween: segment,
-        duration,
-      };
-    }
+    const depSec = timeToSeconds(departure);
+    if (depSec < nowSeconds) continue;
+
+    const route = routes.find((r: any) => r.route_id === trip.route_id);
+
+    results.push({
+      line: route?.route_short_name,
+      departure,
+      arrival,
+      duration: Math.floor(
+        (timeToSeconds(arrival) - depSec) / 60
+      ),
+    });
   }
 
-  return null;
-}
+  results.sort(
+    (a, b) => timeToSeconds(a.departure) - timeToSeconds(b.departure)
+  );
 
-function timeToMinutes(time: string) {
-  const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
+  return results[0] || null;
 }

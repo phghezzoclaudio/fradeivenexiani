@@ -1,42 +1,29 @@
+import fs from "fs";
 import path from "path";
-import Papa from "papaparse";
-import AdmZip from "adm-zip";
-import type { Stop, StopTime } from "./types";
+import csv from "csv-parser";
 
-let zipCache: AdmZip | null = null;
+const GTFS_PATH = path.join(process.cwd(), "data/gtfs");
 
-function getZip() {
-  if (!zipCache) {
-    const zipPath = path.join(process.cwd(), "data/gtfs/actv__nav.zip");
-    zipCache = new AdmZip(zipPath);
-  }
-  return zipCache;
-}
-
-function loadCSVFromZip<T>(fileName: string): T[] {
-  const zip = getZip();
-  const entry = zip.getEntry(fileName);
-
-  if (!entry) {
-    throw new Error(`File ${fileName} not found inside GTFS zip`);
-  }
-
-  const content = entry.getData().toString("utf8");
-
-  const parsed = Papa.parse<T>(content, {
-    header: true,
-    skipEmptyLines: true,
+function loadCSV(file: string): Promise<any[]> {
+  return new Promise((resolve) => {
+    const results: any[] = [];
+    fs.createReadStream(path.join(GTFS_PATH, file))
+      .pipe(csv())
+      .on("data", (data) => results.push(data))
+      .on("end", () => resolve(results));
   });
-
-  return parsed.data;
 }
 
-export function loadGTFS() {
-  return {
-    stops: loadCSVFromZip<Stop>("stops.txt"),
-    stopTimes: loadCSVFromZip<StopTime>("stop_times.txt"),
-    trips: loadCSVFromZip<any>("trips.txt"),
-    routes: loadCSVFromZip<any>("routes.txt"),
-    shapes: loadCSVFromZip<any>("shapes.txt"),
-  };
+export async function loadGTFS() {
+  const [stops, trips, stopTimes, routes, calendar, calendarDates] =
+    await Promise.all([
+      loadCSV("stops.txt"),
+      loadCSV("trips.txt"),
+      loadCSV("stop_times.txt"),
+      loadCSV("routes.txt"),
+      loadCSV("calendar.txt"),
+      loadCSV("calendar_dates.txt"),
+    ]);
+
+  return { stops, trips, stopTimes, routes, calendar, calendarDates };
 }
