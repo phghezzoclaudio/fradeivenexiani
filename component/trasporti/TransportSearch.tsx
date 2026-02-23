@@ -52,8 +52,9 @@ export default function TransportSearch({ onSearch }: Props) {
       </select>
 
       <button
+        disabled={!from || !to}
         onClick={() => onSearch(from, to)}
-        className="w-full bg-[var(--rosso-veneziano)] text-white py-4 rounded-2xl font-semibold"
+        className="w-full bg-[var(--rosso-veneziano)] text-white py-4 rounded-2xl font-semibold disabled:opacity-50"
       >
         Cerca percorso
       </button>
