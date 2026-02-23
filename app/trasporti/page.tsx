@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import TransportSearch from "@component/transport/TransportSearch";
-import RouteResult from "@/component/RouteResult";
-import Loader from "@/component/Loader";
+import TransportSearch from "../../component/trasporti/TransportSearch";
+import RouteResult from "../../component/trasporti/RouteResult";
+import Loader from "../../component/trasporti/Loader";
 
 export default function TrasportiPage() {
   const [result, setResult] = useState<any>(null);
