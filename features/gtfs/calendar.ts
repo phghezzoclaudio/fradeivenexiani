@@ -1,13 +1,31 @@
-import { getRomeNow } from "./index";
+export function getValidServiceIds(
+  calendar: any[],
+  calendarDates: any[]
+) {
+  const now = new Date();
 
-export function getValidServiceIds(calendar: any[], calendarDates: any[]) {
-  const today = getRomeNow();
-  const todayStr = today.toFormat("yyyyLLdd");
-  const weekday = today.toFormat("cccc").toLowerCase();
+  // formato YYYYMMDD
+  const todayStr =
+    now.getFullYear().toString() +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    String(now.getDate()).padStart(2, "0");
+
+  const weekdayMap = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ];
+
+  const weekday = weekdayMap[now.getDay()];
 
   const valid = new Set<string>();
 
-  calendar.forEach((service) => {
+  // calendar.txt
+  calendar?.forEach((service: any) => {
     if (
       todayStr >= service.start_date &&
       todayStr <= service.end_date &&
@@ -17,7 +35,8 @@ export function getValidServiceIds(calendar: any[], calendarDates: any[]) {
     }
   });
 
-  calendarDates.forEach((exception) => {
+  // calendar_dates.txt
+  calendarDates?.forEach((exception: any) => {
     if (exception.date === todayStr) {
       if (exception.exception_type === "1") {
         valid.add(exception.service_id);

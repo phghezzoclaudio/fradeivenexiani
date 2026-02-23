@@ -1,4 +1,3 @@
-import { DateTime } from "luxon";
 import { loadGTFS } from "./parser";
 
 let cache: any = null;
@@ -12,16 +11,21 @@ export async function getGTFSIndex() {
   const tripsById = new Map();
   const tripsByRoute = new Map();
 
-  data.stops.forEach((s: any) => stopsById.set(s.stop_id, s));
+  data.stops?.forEach((s: any) => {
+    stopsById.set(s.stop_id, s);
+  });
 
-  data.stopTimes.forEach((st: any) => {
-    if (!tripsById.has(st.trip_id)) tripsById.set(st.trip_id, []);
+  data.stopTimes?.forEach((st: any) => {
+    if (!tripsById.has(st.trip_id)) {
+      tripsById.set(st.trip_id, []);
+    }
     tripsById.get(st.trip_id).push(st);
   });
 
-  data.trips.forEach((trip: any) => {
-    if (!tripsByRoute.has(trip.route_id))
+  data.trips?.forEach((trip: any) => {
+    if (!tripsByRoute.has(trip.route_id)) {
       tripsByRoute.set(trip.route_id, []);
+    }
     tripsByRoute.get(trip.route_id).push(trip);
   });
 
@@ -36,10 +40,17 @@ export async function getGTFSIndex() {
 }
 
 export function getRomeNow() {
-  return DateTime.now().setZone("Europe/Rome");
+  return new Date();
+}
+
+export function getRomeSecondsNow() {
+  const now = new Date();
+  return now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
 }
 
 export function timeToSeconds(t: string) {
+  if (!t) return 0;
+
   const [h, m, s] = t.split(":").map(Number);
   return h * 3600 + m * 60 + s;
 }

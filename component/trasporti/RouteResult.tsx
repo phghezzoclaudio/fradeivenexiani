@@ -1,5 +1,3 @@
-import { DateTime } from "luxon";
-
 interface Props {
   data: {
     line: string;
@@ -11,17 +9,20 @@ interface Props {
 
 export default function RouteResult({ data }: Props) {
 
-  const now = DateTime.now().setZone("Europe/Rome");
-  const departureTime = DateTime.fromFormat(
-    data.departure,
-    "HH:mm:ss",
-    { zone: "Europe/Rome" }
-  );
+  function getMinutesToDeparture(timeStr: string) {
+    const now = new Date();
+    const [h, m, s] = timeStr.split(":").map(Number);
 
-  const minutes = Math.max(
-    0,
-    Math.floor(departureTime.diff(now, "minutes").minutes)
-  );
+    const departure = new Date();
+    departure.setHours(h);
+    departure.setMinutes(m);
+    departure.setSeconds(s);
+
+    const diff = departure.getTime() - now.getTime();
+    return Math.max(0, Math.floor(diff / 60000));
+  }
+
+  const minutes = getMinutesToDeparture(data.departure);
 
   return (
     <div className="mt-8 bg-white p-6 rounded-3xl shadow-xl border border-[var(--oro-veneziano)]/40">
