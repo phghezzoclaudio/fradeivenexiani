@@ -24,16 +24,25 @@ export interface StopTime {
 export interface Trip {
 
   trip_id: string;
+
   route_id: string;
+
+  service_id: string;
+
   shape_id: string;
+
+  trip_headsign?: string;
 
 }
 
 export interface Route {
 
   route_id: string;
+
   route_short_name: string;
+
   route_long_name: string;
+
   route_color?: string;
 
 }
@@ -41,8 +50,23 @@ export interface Route {
 export interface Shape {
 
   shape_id: string;
+
   shape_pt_lat: string;
+
   shape_pt_lon: string;
+
   shape_pt_sequence: string;
+
+}
+
+export interface RouteResult {
+
+  tripId: string;
+
+  routeId: string;
+
+  departure: string;
+
+  arrival: string;
 
 }
