@@ -2,50 +2,72 @@ import { getGTFSIndex } from "./index";
 import type { StopTime } from "./types";
 
 export function findDirectRoute(
-  fromId: string,
-  toId: string
+  fromStopId: string,
+  toStopId: string
 ) {
 
-  const { stopTimesByTrip } = getGTFSIndex();
+  const { stopTimes } = getGTFSIndex();
 
-  for (const [tripId, times] of stopTimesByTrip.entries()) {
+  if (!stopTimes || stopTimes.length === 0) {
 
-    const sorted = (times as StopTime[])
-      .slice()
-      .sort(
-        (a: StopTime, b: StopTime) =>
-          Number(a.stop_sequence) -
-          Number(b.stop_sequence)
-      );
+    console.log("No stopTimes loaded");
 
-    const fromIndex =
-      sorted.findIndex(
-        (t: StopTime) =>
-          t.stop_id === fromId
-      );
+    return null;
 
-    if (fromIndex === -1)
-      continue;
+  }
 
-    const toIndex =
-      sorted.findIndex(
-        (t: StopTime) =>
-          t.stop_id === toId
-      );
+  // raggruppa per trip_id
+  const trips = new Map<string, StopTime[]>();
 
-    if (toIndex === -1)
-      continue;
+  stopTimes.forEach((st: StopTime) => {
 
-    if (fromIndex < toIndex) {
+    if (!trips.has(st.trip_id)) {
+
+      trips.set(st.trip_id, []);
+
+    }
+
+    trips.get(st.trip_id)!.push(st);
+
+  });
+
+  // controlla ogni trip
+  for (const [tripId, times] of trips.entries()) {
+
+    const ordered = times.sort(
+      (a, b) =>
+        Number(a.stop_sequence)
+        - Number(b.stop_sequence)
+    );
+
+    let fromIndex = -1;
+    let toIndex = -1;
+
+    ordered.forEach((t, index) => {
+
+      if (t.stop_id === fromStopId)
+        fromIndex = index;
+
+      if (t.stop_id === toStopId)
+        toIndex = index;
+
+    });
+
+    if (
+      fromIndex !== -1 &&
+      toIndex !== -1 &&
+      fromIndex < toIndex
+    ) {
 
       return {
+
         tripId,
-        fromStop: sorted[fromIndex],
-        toStop: sorted[toIndex],
-        path: sorted.slice(
-          fromIndex,
-          toIndex + 1
-        )
+        fromStopId,
+        toStopId,
+        stopsCount: toIndex - fromIndex,
+        departure: ordered[fromIndex].departure_time,
+        arrival: ordered[toIndex].arrival_time,
+
       };
 
     }
