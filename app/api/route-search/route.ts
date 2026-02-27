@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { findDirectRoute } from "@/features/gtfs/searchRoute";
+import { findRoute } from "@/features/gtfs/searchRoute";
 
 export async function GET(req: Request) {
 
@@ -9,16 +9,12 @@ export async function GET(req: Request) {
   const to = searchParams.get("to");
 
   if (!from || !to)
-    return NextResponse.json({
-      error: "missing params"
-    });
+    return NextResponse.json({ error: "missing params" });
 
-  const route = findDirectRoute(from, to);
+  const route = findRoute(from, to);
 
   if (!route)
-    return NextResponse.json({
-      error: "no route found"
-    });
+    return NextResponse.json({ error: "no route found" });
 
   return NextResponse.json(route);
 

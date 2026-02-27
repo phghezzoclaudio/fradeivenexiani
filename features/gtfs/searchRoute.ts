@@ -1,76 +1,47 @@
 import { getGTFSIndex } from "./index";
 import type { StopTime } from "./types";
 
-export function findDirectRoute(
-  fromStopId: string,
-  toStopId: string
-) {
+export function findRoute(fromStopId: string, toStopId: string) {
 
-  const { stopTimes } = getGTFSIndex();
+  const { stopTimesByTrip, tripsById } = getGTFSIndex();
 
-  if (!stopTimes || stopTimes.length === 0) {
+  for (const [tripId, stopTimes] of stopTimesByTrip.entries()) {
 
-    console.log("No stopTimes loaded");
+    const ordered = (stopTimes as StopTime[])
+      .slice()
+      .sort((a, b) =>
+        Number(a.stop_sequence) - Number(b.stop_sequence)
+      );
 
-    return null;
-
-  }
-
-  // raggruppa per trip_id
-  const trips = new Map<string, StopTime[]>();
-
-  stopTimes.forEach((st: StopTime) => {
-
-    if (!trips.has(st.trip_id)) {
-
-      trips.set(st.trip_id, []);
-
-    }
-
-    trips.get(st.trip_id)!.push(st);
-
-  });
-
-  // controlla ogni trip
-  for (const [tripId, times] of trips.entries()) {
-
-    const ordered = times.sort(
-      (a, b) =>
-        Number(a.stop_sequence)
-        - Number(b.stop_sequence)
+    const fromIndex = ordered.findIndex(
+      s => s.stop_id === fromStopId
     );
 
-    let fromIndex = -1;
-    let toIndex = -1;
+    if (fromIndex === -1) continue;
 
-    ordered.forEach((t, index) => {
+    const toIndex = ordered.findIndex(
+      s => s.stop_id === toStopId
+    );
 
-      if (t.stop_id === fromStopId)
-        fromIndex = index;
+    if (toIndex === -1) continue;
 
-      if (t.stop_id === toStopId)
-        toIndex = index;
+    if (fromIndex >= toIndex) continue;
 
-    });
+    const trip = tripsById.get(tripId);
 
-    if (
-      fromIndex !== -1 &&
-      toIndex !== -1 &&
-      fromIndex < toIndex
-    ) {
+    return {
 
-      return {
+      tripId,
 
-        tripId,
-        fromStopId,
-        toStopId,
-        stopsCount: toIndex - fromIndex,
-        departure: ordered[fromIndex].departure_time,
-        arrival: ordered[toIndex].arrival_time,
+      shapeId: trip?.shape_id,
 
-      };
+      departure: ordered[fromIndex].departure_time,
 
-    }
+      arrival: ordered[toIndex].arrival_time,
+
+      stops: ordered.slice(fromIndex, toIndex + 1)
+
+    };
 
   }
 
