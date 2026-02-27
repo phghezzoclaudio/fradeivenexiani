@@ -1,43 +1,69 @@
 import path from "path";
-import Papa from "papaparse";
 import AdmZip from "adm-zip";
+import Papa from "papaparse";
 
-let cache: any = null;
+let zipCache: AdmZip | null = null;
 
-export function loadGTFS() {
+function getZip(): AdmZip {
 
-  if (cache) return cache;
+  if (!zipCache) {
 
-  const zipPath = path.join(
-    process.cwd(),
-    "data/gtfs/actv__nav.zip"
-  );
+    const zipPath = path.join(
+      process.cwd(),
+      "data/gtfs/actv__nav.zip"
+    );
 
-  const zip = new AdmZip(zipPath);
-
-  function load(file: string) {
-
-    const entry = zip.getEntry(file);
-
-    if (!entry)
-      throw new Error(`${file} missing in zip`);
-
-    const txt = entry.getData().toString("utf8");
-
-    return Papa.parse(txt, {
-      header: true,
-      skipEmptyLines: true,
-    }).data;
+    zipCache = new AdmZip(zipPath);
 
   }
 
-  cache = {
-    stops: load("stops.txt"),
-    stopTimes: load("stop_times.txt"),
-    trips: load("trips.txt"),
-    shapes: load("shapes.txt"),
-  };
+  return zipCache;
 
-  return cache;
+}
+
+function readCSV(file: string): any[] {
+
+  const zip = getZip();
+
+  const entry = zip.getEntry(file);
+
+  if (!entry)
+    throw new Error(`${file} missing`);
+
+  const text =
+    entry.getData().toString("utf8");
+
+  const parsed = Papa.parse(text, {
+
+    header: true,
+
+    skipEmptyLines: true
+
+  });
+
+  return parsed.data;
+
+}
+
+export function loadGTFS() {
+
+  return {
+
+    stops:
+      readCSV("stops.txt"),
+
+    stopTimes:
+      readCSV("stop_times.txt"),
+
+    trips:
+      readCSV("trips.txt"),
+
+    shapes:
+      readCSV("shapes.txt"),
+
+    routes:
+      readCSV("routes.txt")
+
+  };
 
 }

@@ -1,49 +1,82 @@
 import { loadGTFS } from "./parser";
-import type { Stop, StopTime } from "./types";
 
-let cache: {
-  stops: Stop[];
-  stopTimesByTrip: Map<string, StopTime[]>;
-} | null = null;
+let cache: any = null;
 
 export function getGTFSIndex() {
 
   if (cache)
     return cache;
 
-  console.log("⚡ Building GTFS index...");
+  const {
 
-  const gtfs = loadGTFS();
+    stops,
 
-  const stops = gtfs.stops as Stop[];
-  const stopTimes = gtfs.stopTimes as StopTime[];
+    stopTimes,
 
-  const stopTimesByTrip = new Map<string, StopTime[]>();
+    trips,
 
-  for (const st of stopTimes) {
+    shapes,
 
-    if (!stopTimesByTrip.has(st.trip_id))
-      stopTimesByTrip.set(st.trip_id, []);
+    routes
 
-    stopTimesByTrip.get(st.trip_id)!.push(st);
+  } = loadGTFS();
 
-  }
+  const stopsById =
+    new Map();
 
-  // ordina per sequenza
-  for (const trip of stopTimesByTrip.values()) {
+  stops.forEach(
+    (s: any) =>
+      stopsById.set(
+        s.stop_id,
+        s
+      )
+  );
 
-    trip.sort(
-      (a, b) =>
-        Number(a.stop_sequence) -
-        Number(b.stop_sequence)
-    );
+  const stopTimesByTrip =
+    new Map();
 
-  }
+  stopTimes.forEach(
+    (st: any) => {
+
+      if (
+        !stopTimesByTrip.has(
+          st.trip_id
+        )
+      )
+
+        stopTimesByTrip.set(
+          st.trip_id,
+          []
+        );
+
+      stopTimesByTrip
+        .get(st.trip_id)
+        .push(st);
+
+    }
+  );
 
   cache = {
+
     stops,
+
+    trips,
+
+    shapes,
+
+    routes,
+
+    stopsById,
+
     stopTimesByTrip
+
   };
+
+  console.log(
+    "GTFS loaded:",
+    stops.length,
+    "stops"
+  );
 
   return cache;
 
