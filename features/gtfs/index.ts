@@ -7,14 +7,10 @@ export function getGTFSIndex() {
 
   if (cache) return cache;
 
-  const data = loadGTFS();
+  const gtfs = loadGTFS();
 
-  const stops = data.stops as Stop[];
-  const stopTimes = data.stopTimes as StopTime[];
-
-  const stopsById = new Map(
-    stops.map(s => [s.stop_id, s])
-  );
+  const stops = gtfs.stops as Stop[];
+  const stopTimes = gtfs.stopTimes as StopTime[];
 
   const stopTimesByTrip = new Map<string, StopTime[]>();
 
@@ -29,15 +25,12 @@ export function getGTFSIndex() {
   }
 
   cache = {
-
     stops,
-    stopsById,
     stopTimesByTrip
-
   };
 
   console.log(
-    "GTFS loaded:",
+    "GTFS indexed:",
     stops.length,
     "stops",
     stopTimesByTrip.size,
