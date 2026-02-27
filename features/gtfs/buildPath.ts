@@ -1,34 +1,27 @@
 import { getGTFSIndex } from "./index";
-import type { StopTime, Stop } from "./types";
+import type { StopTime } from "./types";
 
-interface Point {
-  lat: number;
-  lon: number;
-}
+export function buildTripPath(tripId: string) {
 
-export function buildTripPath(tripId: string): Point[] {
+  const { stopTimesByTrip, stopsById } = getGTFSIndex();
 
-  const { stopTimesByTrip, stops } = getGTFSIndex();
-
-  const times = stopTimesByTrip.get(tripId) as StopTime[] | undefined;
+  const times = stopTimesByTrip.get(tripId);
 
   if (!times) return [];
 
-  return times
-    .map((t: StopTime) => {
+  return (times as StopTime[])
+    .map(st => {
 
-      const stop = stops.find(
-        (s: Stop) => s.stop_id === t.stop_id
-      );
+      const stop = stopsById.get(st.stop_id);
 
       if (!stop) return null;
 
       return {
-        lat: Number(stop.stop_lat),
-        lon: Number(stop.stop_lon)
+        lat: parseFloat(stop.stop_lat),
+        lon: parseFloat(stop.stop_lon)
       };
 
     })
-    .filter((p: Point | null): p is Point => p !== null);
+    .filter(Boolean);
 
 }

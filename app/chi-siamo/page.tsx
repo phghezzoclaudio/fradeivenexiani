@@ -74,7 +74,7 @@ export default function ChiSiamoPage() {
             <div className="text-center">
               <div className="relative w-48 h-48 mx-auto mb-6 rounded-2xl overflow-hidden bg-gray-200">
                 <Image
-                  src="/images/brand/fratello-1.jpg"
+                  src=""
                   alt="Fradeivenexiani"
                   fill
                   className="object-cover"
@@ -95,7 +95,7 @@ export default function ChiSiamoPage() {
             <div className="text-center">
               <div className="relative w-48 h-48 mx-auto mb-6 rounded-2xl overflow-hidden bg-gray-200">
                 <Image
-                  src="/images/brand/fratello-2.jpg"
+                  src=""
                   alt="Fradeivenexiani"
                   fill
                   className="object-cover"

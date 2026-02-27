@@ -2,33 +2,41 @@
 
 import { useEffect, useState } from "react";
 
+/* ========================
+   TYPES
+======================== */
+
 interface Stop {
   stop_id: string;
   stop_name: string;
+  stop_lat: string;
+  stop_lon: string;
+}
+
+interface PathPoint {
   lat: number;
   lon: number;
 }
 
 interface Props {
-
-  path: {
-    lat: number;
-    lon: number;
-  }[];
-
-  stops?: Stop[];
-
-  lineName?: string;
-
+  path: PathPoint[];
+  stops: Stop[];
 }
+
+/* ========================
+   COMPONENT
+======================== */
 
 export default function VaporettoMapClient({
   path,
-  stops = [],
-  lineName = "?"
+  stops
 }: Props) {
 
   const [Leaflet, setLeaflet] = useState<any>(null);
+
+  /* ========================
+     LOAD LEAFLET CLIENT SIDE
+  ======================== */
 
   useEffect(() => {
 
@@ -48,8 +56,8 @@ export default function VaporettoMapClient({
 
   if (!Leaflet)
     return (
-      <div className="h-[500px] flex items-center justify-center">
-        Caricamento mappa vaporetto...
+      <div className="h-[600px] flex items-center justify-center">
+        Caricamento mappa...
       </div>
     );
 
@@ -58,12 +66,19 @@ export default function VaporettoMapClient({
     TileLayer,
     Polyline,
     Marker,
-    Popup,
-    CircleMarker
+    Popup
   } = Leaflet;
 
+  /* ========================
+     ROUTE LINE
+  ======================== */
+
   const positions =
-    path.map(p => [p.lat, p.lon]);
+    path?.map(p => [p.lat, p.lon]) || [];
+
+  /* ========================
+     RENDER
+  ======================== */
 
   return (
 
@@ -71,60 +86,59 @@ export default function VaporettoMapClient({
       center={[45.4371, 12.3326]}
       zoom={14}
       style={{
-        height: "500px",
+        height: "600px",
         width: "100%"
       }}
     >
 
       <TileLayer
-        attribution="© OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="© OpenStreetMap"
       />
 
-      {/* linea vaporetto */}
+      {/* ROUTE LINE */}
+
       {positions.length > 0 && (
 
         <Polyline
           positions={positions}
           pathOptions={{
-            color: "#ef4444",
+            color: "#0074D9",
             weight: 5
           }}
         />
 
       )}
 
-      {/* fermate */}
-      {stops.map(stop => (
+      {/* ROUTE STOPS ONLY */}
 
-        <CircleMarker
+      {stops?.map(stop => (
+
+        <Marker
           key={stop.stop_id}
-          center={[stop.lat, stop.lon]}
-          radius={6}
-          pathOptions={{
-            color: "#1d4ed8",
-            fillColor: "#3b82f6",
-            fillOpacity: 1
-          }}
+          position={[
+            parseFloat(stop.stop_lat),
+            parseFloat(stop.stop_lon)
+          ]}
         >
 
           <Popup>
 
             <div>
 
-              <div className="font-bold">
-                {stop.stop_name}
-              </div>
+              <b>
+                {stop.stop_name.replace(/"/g, "")}
+              </b>
 
-              <div className="text-sm">
-                Linea: {lineName}
-              </div>
+              <br/>
+
+              ID: {stop.stop_id}
 
             </div>
 
           </Popup>
 
-        </CircleMarker>
+        </Marker>
 
       ))}
 

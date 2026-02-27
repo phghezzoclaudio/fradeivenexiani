@@ -1,75 +1,69 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import StopsAutocomplete from "@/component/routes/StopsAutocomplete";
 import VaporettoMapClient from "@/component/map/VaporettoMapClient";
 
-export default function RoutesPage() {
+export default function TestMappa() {
 
-  const [routes, setRoutes] = useState<any[]>([]);
-  const [selectedRoute, setSelectedRoute] = useState<string | null>(null);
-  const [mapData, setMapData] = useState<any>(null);
+  const [fromId, setFromId] = useState<string | null>(null);
+  const [toId, setToId] = useState<string | null>(null);
 
-  useEffect(() => {
+  const [path, setPath] = useState<any[]>([]);
+  const [stops, setStops] = useState<any[]>([]);
 
-    fetch("/api/routes")
-      .then(res => res.json())
-      .then(setRoutes);
+  async function searchRoute() {
 
-  }, []);
+    if (!fromId || !toId) return;
 
-  useEffect(() => {
+    console.log("Searching route:", fromId, toId);
 
-    if (!selectedRoute) return;
+    const res = await fetch(
+      `/api/route-search?from=${fromId}&to=${toId}`
+    );
 
-    fetch(`/api/route-shape?routeId=${selectedRoute}`)
-      .then(res => res.json())
-      .then(setMapData);
+    const data = await res.json();
 
-  }, [selectedRoute]);
+    console.log("Route result:", data);
+
+    setPath(data.path || []);
+    setStops(data.stops || []);
+
+  }
 
   return (
 
-    <div className="flex h-screen">
+    <div className="p-6">
 
-      {/* sidebar */}
+      <h1 className="text-2xl font-bold mb-4">
+        Cerca percorso vaporetto
+      </h1>
 
-      <div className="w-80 border-r overflow-y-auto">
+      <div className="flex gap-4 mb-4">
 
-        <h2 className="p-4 font-bold text-lg">
-          Linee Vaporetto
-        </h2>
+        <StopsAutocomplete
+          placeholder="Partenza"
+          onChange={(id)=>setFromId(id)}
+        />
 
-        {routes.map(route => (
+        <StopsAutocomplete
+          placeholder="Destinazione"
+          onChange={(id)=>setToId(id)}
+        />
 
-          <div
-            key={route.route_id}
-            className="p-3 border-b cursor-pointer hover:bg-gray-100"
-            onClick={() => setSelectedRoute(route.route_id)}
-          >
-            Linea {route.route_short_name}
-          </div>
-
-        ))}
-
-      </div>
-
-      {/* map */}
-
-      <div className="flex-1">
-
-        {mapData && (
-
-          <VaporettoMapClient
-
-            path={mapData.path}
-
-            stops={mapData.stops}
-
-          />
-
-        )}
+        <button
+          onClick={searchRoute}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Cerca
+        </button>
 
       </div>
+
+      <VaporettoMapClient
+        path={path}
+        stops={stops}
+      />
 
     </div>
 
