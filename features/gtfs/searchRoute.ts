@@ -1,86 +1,155 @@
-import { getGTFSIndex, getRomeNow, timeToSeconds } from "./index";
-import { getValidServiceIds } from "./calendar";
+import { getGTFSIndex } from "./index";
+import type { Stop, StopTime } from "./types";
 
-export async function findDirectRoute(from: string, to: string) {
-  const {
-    stopsById,
-    tripsById,
-    trips,
-    routes,
-    calendar,
-    calendarDates,
-  } = await getGTFSIndex();
 
-  const validServices = getValidServiceIds(calendar, calendarDates);
+/* ===============================
+   NORMALIZZAZIONE NOMI FERMATE
+   =============================== */
 
- const now = getRomeNow();
+function normalize(name: string): string {
 
-const nowSeconds =
-  now.getHours() * 3600 +
-  now.getMinutes() * 60 +
-  now.getSeconds();
+  return name
+    .toLowerCase()
+    .replace(/"/g, "")
+    .replace(/'/g, "")
+    .replace(/\b[a-z]\b/g, "")   // rimuove A B C D singole
+    .replace(/\s+/g, " ")
+    .trim();
 
-  const fromStops: string[] = [];
-  const toStops: string[] = [];
+}
 
-  stopsById.forEach((stop: any) => {
-    if (stop.stop_name.toLowerCase().includes(from.toLowerCase()))
-      fromStops.push(stop.stop_id);
 
-    if (stop.stop_name.toLowerCase().includes(to.toLowerCase()))
-      toStops.push(stop.stop_id);
-  });
+/* ===============================
+   TROVA FERMATA MIGLIORE
+   =============================== */
 
-  const results: any[] = [];
+function findStopByName(
+  stops: Stop[],
+  input: string
+): Stop | null {
 
-  for (const [tripId, stopTimes] of tripsById.entries()) {
+  const target = normalize(input);
 
-    const trip = trips.find((t: any) => t.trip_id === tripId);
-    if (!trip || !validServices.has(trip.service_id)) continue;
+  let bestMatch: Stop | null = null;
+  let bestScore = 999;
 
-    const ordered = stopTimes
-      .slice()
-      .sort((a: any, b: any) =>
-        Number(a.stop_sequence) - Number(b.stop_sequence)
-      );
+  for (const stop of stops) {
 
-    const fromIndex = ordered.findIndex((s: any) =>
-      fromStops.includes(s.stop_id)
-    );
+    const stopNorm = normalize(stop.stop_name);
 
-    const toIndex = ordered.findIndex((s: any) =>
-      toStops.includes(s.stop_id)
-    );
+    // match perfetto
+    if (stopNorm === target)
+      return stop;
 
-    if (fromIndex === -1 || toIndex === -1) continue;
-    if (fromIndex >= toIndex) continue;
+    // inizia con
+    if (stopNorm.startsWith(target) && bestScore > 1) {
 
-    const departure = ordered[fromIndex].departure_time;
-    const arrival = ordered[toIndex].arrival_time;
+      bestScore = 1;
+      bestMatch = stop;
 
-    const depSec = timeToSeconds(departure);
-    if (depSec < nowSeconds) continue;
+    }
 
-    const route = routes.find(
-      (r: any) => r.route_id === trip.route_id
-    );
+    // contiene
+    if (stopNorm.includes(target) && bestScore > 2) {
 
-    results.push({
-      tripId,                    
-      routeId: trip.route_id,
-      line: route?.route_short_name,
-      departure,
-      arrival,
-      duration: Math.floor(
-        (timeToSeconds(arrival) - depSec) / 60
-      ),
-      stopsBetween: ordered.slice(fromIndex, toIndex + 1)
-    });
+      bestScore = 2;
+      bestMatch = stop;
+
+    }
+
   }
 
-  results.sort(
-    (a, b) => timeToSeconds(a.departure) - timeToSeconds(b.departure)
-  );
+  return bestMatch;
 
-  return results[0] || null;
+}
+
+
+/* ===============================
+   TROVA PERCORSO DIRETTO
+   =============================== */
+
+export function findDirectRoute(
+  fromName: string,
+  toName: string
+) {
+
+  const { stops, stopTimesByTrip } = getGTFSIndex();
+
+  if (!stops || stops.length === 0) {
+
+    console.log("GTFS stops empty");
+    return null;
+
+  }
+
+  const fromStop = findStopByName(stops, fromName);
+  const toStop = findStopByName(stops, toName);
+
+  if (!fromStop || !toStop) {
+
+    console.log("Stop not found:", {
+      fromName,
+      toName
+    });
+
+    return null;
+
+  }
+
+  console.log("Resolved stops:", {
+    from: fromStop.stop_name,
+    to: toStop.stop_name
+  });
+
+
+  /* cerca trip valido */
+
+  for (const [tripId, stopTimes] of stopTimesByTrip.entries()) {
+
+    const fromIndex = stopTimes.findIndex(
+      (t: StopTime) => t.stop_id === fromStop.stop_id
+    );
+
+    if (fromIndex === -1)
+      continue;
+
+    const toIndex = stopTimes.findIndex(
+      (t: StopTime) => t.stop_id === toStop.stop_id
+    );
+
+    if (toIndex === -1)
+      continue;
+
+    if (fromIndex < toIndex) {
+
+      console.log("Trip found:", tripId);
+
+      return {
+
+        tripId,
+
+        fromStop: {
+          id: fromStop.stop_id,
+          name: fromStop.stop_name,
+          lat: parseFloat(fromStop.stop_lat),
+          lon: parseFloat(fromStop.stop_lon)
+        },
+
+        toStop: {
+          id: toStop.stop_id,
+          name: toStop.stop_name,
+          lat: parseFloat(toStop.stop_lat),
+          lon: parseFloat(toStop.stop_lon)
+        }
+
+      };
+
+    }
+
+  }
+
+  console.log("No direct route found");
+
+  return null;
+
 }

@@ -1,31 +1,34 @@
 import { getGTFSIndex } from "./index";
-import { getStopCoords } from "./geo";
-import type { StopTime } from "./types";
+import type { StopTime, Stop } from "./types";
 
-export interface Point {
+interface Point {
   lat: number;
   lon: number;
 }
 
-export async function buildTripPath(
-  tripId: string
-): Promise<Point[]> {
+export function buildTripPath(tripId: string): Point[] {
 
-  const index = await getGTFSIndex();
+  const { stopTimesByTrip, stops } = getGTFSIndex();
 
-  const trip = index.tripsById.get(tripId);
+  const times = stopTimesByTrip.get(tripId) as StopTime[] | undefined;
 
-  if (!trip) return [];
+  if (!times) return [];
 
-  return trip
-    .sort(
-      (a: StopTime, b: StopTime) =>
-        Number(a.stop_sequence) - Number(b.stop_sequence)
-    )
-    .map((st: StopTime) =>
-      getStopCoords(st.stop_id)
-    )
-    .filter(
-      (p: Point | null): p is Point => p !== null
-    );
+  return times
+    .map((t: StopTime) => {
+
+      const stop = stops.find(
+        (s: Stop) => s.stop_id === t.stop_id
+      );
+
+      if (!stop) return null;
+
+      return {
+        lat: Number(stop.stop_lat),
+        lon: Number(stop.stop_lon)
+      };
+
+    })
+    .filter((p: Point | null): p is Point => p !== null);
+
 }

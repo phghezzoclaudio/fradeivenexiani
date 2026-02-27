@@ -1,59 +1,43 @@
 import path from "path";
-import fs from "fs";
+import Papa from "papaparse";
 import AdmZip from "adm-zip";
 
-const ZIP_PATH = path.resolve(
-  process.cwd(),
-  "data",
-  "gtfs",
-  "actv__nav.zip"
-);
+let cache: any = null;
 
-console.log("ZIP PATH:", ZIP_PATH);
-console.log("ZIP EXISTS:", fs.existsSync(ZIP_PATH));
+export function loadGTFS() {
 
-function parseCSV(text: string) {
-  const lines = text.split("\n").filter(Boolean);
-  const headers = lines[0].split(",");
+  if (cache) return cache;
 
-  return lines.slice(1).map((line) => {
-    const values = line.split(",");
-    const obj: any = {};
+  const zipPath = path.join(
+    process.cwd(),
+    "data/gtfs/actv__nav.zip"
+  );
 
-    headers.forEach((header, i) => {
-      obj[header.trim()] = values[i]?.trim();
-    });
+  const zip = new AdmZip(zipPath);
 
-    return obj;
-  });
-}
+  function load(file: string) {
 
-export async function loadGTFS() {
-  const zip = new AdmZip(ZIP_PATH);
+    const entry = zip.getEntry(file);
 
-  const files = {
-    stops: "stops.txt",
-    trips: "trips.txt",
-    stopTimes: "stop_times.txt",
-    routes: "routes.txt",
-    calendar: "calendar.txt",
-    calendarDates: "calendar_dates.txt",
-  };
+    if (!entry)
+      throw new Error(`${file} missing in zip`);
 
-  const data: any = {};
+    const txt = entry.getData().toString("utf8");
 
-  for (const key in files) {
-    const entry = zip.getEntry(files[key as keyof typeof files]);
+    return Papa.parse(txt, {
+      header: true,
+      skipEmptyLines: true,
+    }).data;
 
-    if (!entry) {
-      console.error("Missing file in zip:", files[key as keyof typeof files]);
-      data[key] = [];
-      continue;
-    }
-
-    const content = entry.getData().toString("utf8");
-    data[key] = parseCSV(content);
   }
 
-  return data;
+  cache = {
+    stops: load("stops.txt"),
+    stopTimes: load("stop_times.txt"),
+    trips: load("trips.txt"),
+    shapes: load("shapes.txt"),
+  };
+
+  return cache;
+
 }
