@@ -1,16 +1,57 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import VaporettoMapClient from "@/component/map/VaporettoMapClient";
 
-export default function TestMappa() {
-  const fakePath = [
-    { lat: 45.4371, lon: 12.3326 },
-    { lat: 45.4385, lon: 12.3350 }
-  ];
+interface Stop {
+  stop_id: string;
+  stop_name: string;
+  stop_lat: string;
+  stop_lon: string;
+}
+
+interface PathPoint {
+  lat: number;
+  lon: number;
+}
+
+export default function ItinerariPage() {
+
+  const [path, setPath] = useState<PathPoint[]>([]);
+  const [stops, setStops] = useState<Stop[]>([]);
+
+  useEffect(() => {
+
+    async function load() {
+
+      const res = await fetch("/api/route");
+
+      const data = await res.json();
+
+      setPath(data.path || []);
+      setStops(data.stops || []);
+
+    }
+
+    load();
+
+  }, []);
 
   return (
-    <div className="p-10">
-      <VaporettoMapClient path={fakePath} />
+
+    <div>
+
+      <h1 className="text-2xl font-bold mb-4">
+        Mappa Vaporetto
+      </h1>
+
+      <VaporettoMapClient
+        path={path}
+        stops={stops}
+      />
+
     </div>
+
   );
+
 }
