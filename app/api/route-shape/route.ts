@@ -1,34 +1,39 @@
-import { NextResponse } from "next/server";
-import { getGTFSIndex } from "@/features/gtfs/index";
-import { buildShapePath } from "@/features/gtfs/buildShapePath";
-import { buildStopsFromTrip } from "@/features/gtfs/buildStopsFromTrip";
+import { getGTFSIndex } from "@/features/gtfs";
 
 export async function GET(req: Request) {
 
-  const { searchParams } = new URL(req.url);
+  try {
 
-  const routeId =
-    searchParams.get("routeId");
+    const { searchParams } = new URL(req.url);
+    const routeId = searchParams.get("route_id");
 
-  const { trips } = getGTFSIndex();
+    if (!routeId)
+      return Response.json([]);
 
-  const trip =
-    trips.find(
-      (t: any) =>
-        t.route_id === routeId
+    const gtfs = await getGTFSIndex();
+
+    const trip = gtfs.trips.find(
+      (t: any) => t.route_id === routeId
     );
 
-  if (!trip)
-    return NextResponse.json(null);
+    if (!trip)
+      return Response.json([]);
 
-  return NextResponse.json({
+    const shapePoints = gtfs.shapes
+      .filter((s: any) => s.shape_id === trip.shape_id)
+      .sort(
+        (a: any, b: any) =>
+          Number(a.shape_pt_sequence) -
+          Number(b.shape_pt_sequence)
+      );
 
-    path:
-      buildShapePath(trip.shape_id),
+    return Response.json(shapePoints);
 
-    stops:
-      buildStopsFromTrip(trip.trip_id)
+  } catch (err) {
 
-  });
+    console.error(err);
+    return Response.json([]);
+
+  }
 
 }
