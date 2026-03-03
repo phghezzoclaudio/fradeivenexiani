@@ -1,7 +1,7 @@
 
 import Link from "next/link";
 
-export default function ChiSiamoPage() {
+export default function itinerari() {
   return (
     <main className="bg-venice-ivory text-venice-graphite">
 
