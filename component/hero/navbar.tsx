@@ -14,6 +14,7 @@ export default function Navbar() {
   const navLinks = [
     { href: "/", label: "" },
     { href: "/itinerari", label: "Itinerari" },
+    { href:"/routes",lober:"Venice Routes"},
     { href: "/arrivare-a-venezia", label: "Arrivare" },
     { href: "/maree", label: "Acqua Alta" },
     { href: "/chi-siamo", label: "Chi siamo" },

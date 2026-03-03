@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useMap } from "react-leaflet";
-import L from "leaflet";
 
 type ZoomToRouteProps = {
   selectedRoute: string | null;
@@ -14,21 +13,21 @@ export default function ZoomToRoute({
 
   const map = useMap();
   const [shapes, setShapes] = useState<any>(null);
+  const [leaflet, setLeaflet] = useState<any>(null);
 
-  // Carico shapes una sola volta
   useEffect(() => {
-
-    fetch("/api/gtfs/shapes.geojson")
-      .then(res => res.json())
-      .then(setShapes)
-      .catch(console.error);
-
+    import("leaflet").then(setLeaflet);
   }, []);
 
-  // Zoom quando cambia selectedRoute
+  useEffect(() => {
+    fetch("/api/gtfs/shapes.geojson")
+      .then(res => res.json())
+      .then(setShapes);
+  }, []);
+
   useEffect(() => {
 
-    if (!selectedRoute || !shapes) return;
+    if (!selectedRoute || !shapes || !leaflet) return;
 
     const filtered = shapes.features.filter(
       (f: any) => f.properties.route_id === selectedRoute
@@ -36,10 +35,10 @@ export default function ZoomToRoute({
 
     if (filtered.length === 0) return;
 
-    const layer = L.geoJSON({
+    const layer = leaflet.geoJSON({
       type: "FeatureCollection",
       features: filtered
-    } as any);
+    });
 
     const bounds = layer.getBounds();
 
@@ -47,7 +46,7 @@ export default function ZoomToRoute({
       map.fitBounds(bounds);
     }
 
-  }, [selectedRoute, shapes]); // 👈 TOLTO map
+  }, [selectedRoute, shapes, leaflet]);
 
   return null;
 }

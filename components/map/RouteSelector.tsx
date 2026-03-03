@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 
 type RouteSelectorProps = {
   selectedRoute: string | null;
-  onSelectRoute: (route: string | null) => void;
+  onSelectRouteAction: (route: string | null) => void;
 };
 
 export default function RouteSelector({
   selectedRoute,
-  onSelectRoute
+  onSelectRouteAction
 }: RouteSelectorProps) {
 
   const [routes, setRoutes] = useState<any>(null);
@@ -17,7 +17,7 @@ export default function RouteSelector({
   useEffect(() => {
 
     fetch("/api/gtfs/routes.geojson")
-      .then(async res => {
+      .then(async (res) => {
         if (!res.ok) throw new Error("Errore API routes");
         return res.json();
       })
@@ -42,14 +42,13 @@ export default function RouteSelector({
         overflowY: "auto"
       }}
     >
-
       <div
         style={{
           cursor: "pointer",
           marginBottom: 6,
           fontWeight: selectedRoute === null ? "bold" : "normal"
         }}
-        onClick={() => onSelectRoute(null)}
+        onClick={() => onSelectRouteAction(null)}
       >
         Tutte le linee
       </div>
@@ -61,7 +60,7 @@ export default function RouteSelector({
         return (
           <div
             key={id}
-            onClick={() => onSelectRoute(id)}
+            onClick={() => onSelectRouteAction(id)}
             style={{
               cursor: "pointer",
               padding: 4,
@@ -73,7 +72,6 @@ export default function RouteSelector({
         );
 
       })}
-
     </div>
   );
 }

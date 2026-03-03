@@ -2,40 +2,37 @@
 
 import { GeoJSON } from "react-leaflet";
 import { useEffect, useState } from "react";
-import L from "leaflet";
 
 export default function StopsLayer() {
 
   const [stops, setStops] = useState<any>(null);
   const [times, setTimes] = useState<any>(null);
+  const [leaflet, setLeaflet] = useState<any>(null);
+
+  // carico leaflet solo nel client
+  useEffect(() => {
+    import("leaflet").then(setLeaflet);
+  }, []);
 
   useEffect(() => {
 
     fetch("/api/gtfs/stops.geojson")
-      .then(async res => {
-        if (!res.ok) throw new Error("Errore API stops");
-        return res.json();
-      })
-      .then(setStops)
-      .catch(console.error);
+      .then(res => res.json())
+      .then(setStops);
 
     fetch("/api/gtfs/stop_times.json")
-      .then(async res => {
-        if (!res.ok) throw new Error("Errore API stop_times");
-        return res.json();
-      })
-      .then(setTimes)
-      .catch(console.error);
+      .then(res => res.json())
+      .then(setTimes);
 
   }, []);
 
-  if (!stops || !times) return null;
+  if (!stops || !times || !leaflet) return null;
 
   return (
     <GeoJSON
       data={stops}
       pointToLayer={(feature: any, latlng) =>
-        L.circleMarker(latlng, {
+        leaflet.circleMarker(latlng, {
           radius: 4,
           color: "#000",
           fillColor: "#fff",

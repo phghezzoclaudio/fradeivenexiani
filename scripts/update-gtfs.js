@@ -4,7 +4,7 @@ const unzipper = require("unzipper");
 const csv = require("csv-parser");
 
 const GTFS_URL =
-"https://actv.avmspa.it/sites/default/files/attachments/opendata/navigazione/actv_nav.zip ";
+"https://actv.avmspa.it/sites/default/files/attachments/opendata/navigazione/actv__nav.zip ";
 
 const ZIP_PATH = "./actv_nav.zip";
 const EXTRACT_PATH = "./gtfs";

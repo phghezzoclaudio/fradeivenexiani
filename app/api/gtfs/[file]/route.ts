@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ file: string }> }
 ) {
 
-  const { file } = await params; // 👈 QUI è la differenza
+  const { file } = await params; 
 
   const filePath = path.join(
     process.cwd(),
