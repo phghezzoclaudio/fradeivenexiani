@@ -1,5 +1,6 @@
-import LeafletMap from "@/components/map/LeafletMap";
+import RoutesLayout from "@/components/map/RoutesLayout";
+import LeafletMap from "@/components/map/RoutesLayout";
 
 export default function Page() {
-  return   <LeafletMap />;
+  return   <RoutesLayout />;
 }
