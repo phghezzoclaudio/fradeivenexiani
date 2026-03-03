@@ -4,57 +4,45 @@ const unzipper = require("unzipper");
 const csv = require("csv-parser");
 
 const GTFS_URL =
-"https://actv.avmspa.it/sites/default/files/attachments/opendata/navigazione/actv__nav.zip ";
+  "https://actv.avmspa.it/sites/default/files/attachments/opendata/navigazione/actv__nav.zip";
 
 const ZIP_PATH = "./actv_nav.zip";
 const EXTRACT_PATH = "./gtfs";
-const OUTPUT_PATH = "./data";
+const OUTPUT_PATH = "./public/data";
 
 function downloadGTFS() {
-
   return new Promise((resolve, reject) => {
-
     const file = fs.createWriteStream(ZIP_PATH);
 
     https.get(GTFS_URL, response => {
-
       response.pipe(file);
-
       file.on("finish", () => {
         file.close(resolve);
       });
-
     }).on("error", reject);
-
   });
-
 }
 
 function extractZip() {
+  if (fs.existsSync(EXTRACT_PATH))
+    fs.rmSync(EXTRACT_PATH, { recursive: true, force: true });
 
   return fs.createReadStream(ZIP_PATH)
     .pipe(unzipper.Extract({ path: EXTRACT_PATH }))
     .promise();
-
 }
 
 function parseCSV(file) {
-
   return new Promise(resolve => {
-
     const results = [];
-
     fs.createReadStream(`${EXTRACT_PATH}/${file}`)
       .pipe(csv())
       .on("data", data => results.push(data))
       .on("end", () => resolve(results));
-
   });
-
 }
 
 async function convertStops() {
-
   const stops = await parseCSV("stops.txt");
 
   const geojson = {
@@ -72,15 +60,10 @@ async function convertStops() {
     }))
   };
 
-  fs.writeFileSync(
-    `${OUTPUT_PATH}/stops.geojson`,
-    JSON.stringify(geojson)
-  );
-
+  fs.writeFileSync(`${OUTPUT_PATH}/stops.geojson`, JSON.stringify(geojson));
 }
 
 async function convertRoutes() {
-
   const routes = await parseCSV("routes.txt");
 
   const geojson = {
@@ -92,59 +75,118 @@ async function convertRoutes() {
     }))
   };
 
-  fs.writeFileSync(
-    `${OUTPUT_PATH}/routes.geojson`,
-    JSON.stringify(geojson)
-  );
-
+  fs.writeFileSync(`${OUTPUT_PATH}/routes.geojson`, JSON.stringify(geojson));
 }
 
 async function convertShapes() {
 
   const shapes = await parseCSV("shapes.txt");
+  const trips = await parseCSV("trips.txt");
+
+  const shapeRouteMap = {};
+  trips.forEach(trip => {
+    if (!shapeRouteMap[trip.shape_id]) {
+      shapeRouteMap[trip.shape_id] = trip.route_id;
+    }
+  });
 
   const grouped = {};
 
-  shapes.forEach(shape => {
+  shapes.forEach(row => {
+    if (!grouped[row.shape_id]) {
+      grouped[row.shape_id] = [];
+    }
 
-    if (!grouped[shape.shape_id])
-      grouped[shape.shape_id] = [];
-
-    grouped[shape.shape_id].push([
-      parseFloat(shape.shape_lon),
-      parseFloat(shape.shape_lat)
-    ]);
-
+    grouped[row.shape_id].push({
+      lon: parseFloat(row.shape_pt_lon),
+      lat: parseFloat(row.shape_pt_lat),
+      seq: parseInt(row.shape_pt_sequence)
+    });
   });
 
-  const geojson = {
-    type: "FeatureCollection",
-    features: Object.entries(grouped).map(
-      ([id, coords]) => ({
-        type: "Feature",
-        geometry: {
-          type: "LineString",
-          coordinates: coords
-        },
-        properties: { shape_id: id }
-      })
-    )
-  };
+  const features = Object.keys(grouped).map(shape_id => {
+    const ordered = grouped[shape_id]
+      .sort((a, b) => a.seq - b.seq);
+
+    return {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: ordered.map(p => [p.lon, p.lat])
+      },
+      properties: {
+        shape_id,
+        route_id: shapeRouteMap[shape_id] || null
+      }
+    };
+  });
 
   fs.writeFileSync(
     `${OUTPUT_PATH}/shapes.geojson`,
-    JSON.stringify(geojson)
+    JSON.stringify({
+      type: "FeatureCollection",
+      features
+    })
   );
-
 }
 
-async function convertStopTimes() {
+async function convertTodayStopTimes() {
 
   const stopTimes = await parseCSV("stop_times.txt");
+  const trips = await parseCSV("trips.txt");
+  const calendar = await parseCSV("calendar.txt");
+  const calendarDates = fs.existsSync(`${EXTRACT_PATH}/calendar_dates.txt`)
+    ? await parseCSV("calendar_dates.txt")
+    : [];
+
+  const today = new Date();
+  const yyyymmdd = today.toISOString().slice(0,10).replace(/-/g,"");
+  const weekday = today.getDay();
+
+  const validServices = new Set();
+
+  calendar.forEach(row => {
+
+    if (yyyymmdd < row.start_date || yyyymmdd > row.end_date)
+      return;
+
+    const days = [
+      row.sunday,
+      row.monday,
+      row.tuesday,
+      row.wednesday,
+      row.thursday,
+      row.friday,
+      row.saturday
+    ];
+
+    if (days[weekday] === "1") {
+      validServices.add(row.service_id);
+    }
+
+  });
+
+  calendarDates.forEach(row => {
+    if (row.date === yyyymmdd) {
+      if (row.exception_type === "1")
+        validServices.add(row.service_id);
+      if (row.exception_type === "2")
+        validServices.delete(row.service_id);
+    }
+  });
+
+  const validTrips = new Set();
+  trips.forEach(trip => {
+    if (validServices.has(trip.service_id)) {
+      validTrips.add(trip.trip_id);
+    }
+  });
 
   const result = {};
 
   stopTimes.forEach(st => {
+    if (!validTrips.has(st.trip_id))
+      return;
 
     if (!result[st.stop_id])
       result[st.stop_id] = [];
@@ -154,17 +196,18 @@ async function convertStopTimes() {
       departure: st.departure_time,
       trip_id: st.trip_id
     });
-
   });
 
   fs.writeFileSync(
-    `${OUTPUT_PATH}/stop_times.json`,
+    `${OUTPUT_PATH}/today_stop_times.json`,
     JSON.stringify(result)
   );
-
 }
 
 async function run() {
+
+  if (!fs.existsSync("./public"))
+    fs.mkdirSync("./public");
 
   if (!fs.existsSync(OUTPUT_PATH))
     fs.mkdirSync(OUTPUT_PATH);
@@ -179,9 +222,9 @@ async function run() {
   await convertStops();
   await convertRoutes();
   await convertShapes();
-  await convertStopTimes();
+  await convertTodayStopTimes();
 
-  console.log("GTFS updated successfully");
+  console.log("✅ GTFS updated successfully");
 
 }
 
