@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import RoutesSidebar from "./RoutesSidebar";
-import RoutesMap from "./RoutesMap";
+
+const RoutesMap = dynamic(
+  () => import("./RoutesMap"),
+  { ssr: false }
+);
 
 export default function RoutesLayout() {
   const [selectedRoute, setSelectedRoute] =

@@ -13,7 +13,6 @@ export default function RoutesSidebar({
 }: Props) {
 
   const [routes, setRoutes] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetch("/api/gtfs/routes.geojson")
@@ -33,12 +32,6 @@ export default function RoutesSidebar({
       });
   }, []);
 
-  const filtered = routes.filter(r =>
-    r.route_short_name
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
-
   return (
     <div style={{
       width: 300,
@@ -48,29 +41,17 @@ export default function RoutesSidebar({
     }}>
       <h2>Linee</h2>
 
-      <input
-        placeholder="Cerca linea..."
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        style={{
-          width: "100%",
-          padding: 8,
-          marginBottom: 15
-        }}
-      />
-
       <button
         onClick={() => onSelectRoute(null)}
         style={{
-          display: "block",
-          marginBottom: 10,
+          marginBottom: 15,
           fontWeight: !selectedRoute ? "bold" : "normal"
         }}
       >
         Tutte le linee
       </button>
 
-      {filtered.map(route => (
+      {routes.map(route => (
         <div
           key={route.route_id}
           onClick={() => onSelectRoute(route.route_id)}
@@ -84,7 +65,7 @@ export default function RoutesSidebar({
           }}
         >
           <span style={{
-            background: `#${route.route_color || "ccc"}`,
+            background: `#${route.route_color}`,
             color: "#fff",
             padding: "2px 6px",
             borderRadius: 4,
