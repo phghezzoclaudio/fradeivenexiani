@@ -1,48 +1,62 @@
 "use client";
 
-import { GeoJSON } from "react-leaflet";
 import { useEffect, useState } from "react";
+import { GeoJSON } from "react-leaflet";
+import type { Feature, FeatureCollection, LineString } from "geojson";
 
-type RoutesLayerProps = {
+interface Props {
   selectedRoute: string | null;
-};
+}
 
-export default function RoutesLayer({
-  selectedRoute
-}: RoutesLayerProps) {
-
-  const [shapes, setShapes] = useState<any>(null);
+export default function RoutesLayer({ selectedRoute }: Props) {
+  const [data, setData] =
+    useState<FeatureCollection<LineString> | null>(null);
 
   useEffect(() => {
-
     fetch("/api/gtfs/shapes.geojson")
-      .then(async res => {
-        if (!res.ok) throw new Error("Errore API shapes");
-        return res.json();
+      .then((res) => res.json())
+      .then((geojson) => {
+        setData(geojson);
       })
-      .then(setShapes)
       .catch(console.error);
-
   }, []);
 
-  if (!shapes) return null;
+  if (!data) return null;
 
+  // 🔎 Filtra per linea selezionata
   const features = selectedRoute
-    ? shapes.features.filter(
-        (f: any) => f.properties.route_id === selectedRoute
+    ? data.features.filter(
+        (f: any) => f.properties?.route_id === selectedRoute
       )
-    : shapes.features;
+    : data.features;
 
   return (
-    <GeoJSON
-      data={{
-        type: "FeatureCollection",
-        features
-      } as any}
-      style={{
-        color: "#0066cc",
-        weight: 4
-      }}
-    />
-  );
+  <GeoJSON
+    data={{
+      type: "FeatureCollection",
+      features: features
+    } as any}
+    style={(feature: any) => ({
+      color:
+        selectedRoute &&
+        feature.properties?.route_id === selectedRoute
+          ? "#e60000"
+          : "#0066cc",
+      weight:
+        selectedRoute &&
+        feature.properties?.route_id === selectedRoute
+          ? 6
+          : 3,
+      opacity: 0.9,
+    })}
+    onEachFeature={(feature: any, layer) => {
+      const name =
+        feature.properties?.route_long_name ||
+        feature.properties?.route_short_name ||
+        feature.properties?.route_id;
+
+      layer.bindPopup(`<b>Linea:</b> ${name}`);
+    }}
+  />
+);
 }

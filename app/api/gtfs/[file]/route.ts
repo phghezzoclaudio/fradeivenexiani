@@ -11,6 +11,7 @@ export async function GET(
 
   const filePath = path.join(
     process.cwd(),
+    "public",
     "data",
     file
   );
