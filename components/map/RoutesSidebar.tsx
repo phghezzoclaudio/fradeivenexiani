@@ -20,20 +20,26 @@ export default function RoutesSidebar({
       .then(r => r.json())
       .then(data => {
 
+        if (!data?.routes?.features) return;
+
         const routes =
           data.routes.features.map(
             (f: any) => f.properties
           );
 
+        // rimuove duplicati
         const uniqueRoutes = Array.from(
           new Map(
-            routes.map((r: any) => [
-              r.route_short_name,
-              r
-            ])
+            routes
+              .filter((r: any) => r.route_short_name)
+              .map((r: any) => [
+                r.route_short_name,
+                r
+              ])
           ).values()
         );
 
+        // ordina numericamente
         uniqueRoutes.sort((a: any, b: any) =>
           a.route_short_name.localeCompare(
             b.route_short_name,
@@ -44,7 +50,10 @@ export default function RoutesSidebar({
 
         setRoutes(uniqueRoutes);
 
-      });
+      })
+      .catch(err =>
+        console.error("Errore routes:", err)
+      );
 
   }, []);
 
@@ -64,7 +73,7 @@ export default function RoutesSidebar({
         const color =
           route.route_color
             ? `#${route.route_color}`
-            : "#888";
+            : "#666";
 
         const active =
           selectedRoute === route.route_short_name;
@@ -73,9 +82,20 @@ export default function RoutesSidebar({
 
           <div
             key={route.route_short_name}
-            onClick={() =>
-              onSelectRoute(route.route_short_name)
-            }
+            onClick={() => {
+
+              // forza aggiornamento linea
+              if (selectedRoute === route.route_short_name) {
+                onSelectRoute(null);
+                setTimeout(() =>
+                  onSelectRoute(route.route_short_name),
+                  50
+                );
+              } else {
+                onSelectRoute(route.route_short_name);
+              }
+
+            }}
             style={{
               textAlign: "center",
               padding: "8px 0",
