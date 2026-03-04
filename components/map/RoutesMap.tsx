@@ -11,6 +11,40 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { FeatureCollection } from "geojson";
 
+/* calcola le prossime partenze */
+function getUpcomingTimes(times: any[], limit = 6) {
+
+  const now = new Date();
+
+  const currentSeconds =
+    now.getHours() * 3600 +
+    now.getMinutes() * 60 +
+    now.getSeconds();
+
+  return times
+    .map(t => {
+
+      const parts = t.arrival.split(":");
+
+      const seconds =
+        parseInt(parts[0]) * 3600 +
+        parseInt(parts[1]) * 60 +
+        parseInt(parts[2]);
+
+      const diff = seconds - currentSeconds;
+
+      return {
+        ...t,
+        seconds,
+        minutes: Math.floor(diff / 60)
+      };
+
+    })
+    .filter(t => t.seconds >= currentSeconds)
+    .sort((a, b) => a.seconds - b.seconds)
+    .slice(0, limit);
+}
+
 function ZoomTo({ geojson }: { geojson: FeatureCollection }) {
 
   const map = useMap();
@@ -23,7 +57,9 @@ function ZoomTo({ geojson }: { geojson: FeatureCollection }) {
     const bounds = layer.getBounds();
 
     if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [80, 80] });
+      map.fitBounds(bounds, {
+        padding: [80, 80]
+      });
     }
 
   }, [geojson, map]);
@@ -69,7 +105,7 @@ export default function RoutesMap({
 
   if (!shapes || !stops) return null;
 
-  // route_id appartenenti alla linea
+  /* route_id appartenenti alla linea */
   const routeIds =
     shapes.features
       .filter(
@@ -78,7 +114,7 @@ export default function RoutesMap({
       )
       .map((f: any) => f.properties?.route_id);
 
-  // percorso linea
+  /* percorso linea */
   const filteredShapes: FeatureCollection = {
     type: "FeatureCollection",
     features: shapes.features.filter(
@@ -87,7 +123,7 @@ export default function RoutesMap({
     )
   };
 
-  // fermate linea
+  /* fermate linea */
   const filteredStops: FeatureCollection = {
     type: "FeatureCollection",
     features: stops.features.filter((f: any) => {
@@ -152,16 +188,33 @@ export default function RoutesMap({
             }
             onEachFeature={(feature: any, layer) => {
 
-              const schedule =
+              const rawTimes =
                 todayStopTimes[
                   feature.properties?.stop_id
                 ] || [];
 
+              const schedule =
+                getUpcomingTimes(rawTimes);
+
               const html = schedule
-                .slice(0, 6)
-                .map((s: any) =>
-                  `<div style="font-size:12px">${s.arrival}</div>`
-                )
+                .map((s: any) => {
+
+                  const min =
+                    s.minutes <= 0
+                      ? "in arrivo"
+                      : `${s.minutes} min`;
+
+                  return `
+                  <div style="
+                    font-size:12px;
+                    display:flex;
+                    justify-content:space-between;
+                  ">
+                    <span>${s.arrival}</span>
+                    <span style="font-weight:600">${min}</span>
+                  </div>
+                  `;
+                })
                 .join("");
 
               layer.bindPopup(`
