@@ -11,7 +11,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { FeatureCollection } from "geojson";
 
-/* calcola le prossime partenze */
+/* calcola prossime partenze */
 function getUpcomingTimes(times: any[], limit = 6) {
 
   const now = new Date();
@@ -68,9 +68,11 @@ function ZoomTo({ geojson }: { geojson: FeatureCollection }) {
 }
 
 export default function RoutesMap({
-  selectedRoute
+  selectedRoute,
+  selectedTerminal
 }: {
   selectedRoute: string | null;
+  selectedTerminal: string | null;
 }) {
 
   const [shapes, setShapes] =
@@ -105,7 +107,7 @@ export default function RoutesMap({
 
   if (!shapes || !stops) return null;
 
-  /* route_id appartenenti alla linea */
+  /* route_id della linea */
   const routeIds =
     shapes.features
       .filter(
