@@ -10,6 +10,7 @@ const ZIP_PATH = "./actv_nav.zip";
 const EXTRACT_PATH = "./gtfs";
 const OUTPUT_PATH = "./public/data";
 
+
 function downloadGTFS() {
 
   return new Promise((resolve, reject) => {
@@ -30,6 +31,7 @@ function downloadGTFS() {
 
 }
 
+
 function extractZip() {
 
   if (fs.existsSync(EXTRACT_PATH))
@@ -41,6 +43,7 @@ function extractZip() {
     .promise();
 
 }
+
 
 function parseCSV(file) {
 
@@ -56,6 +59,7 @@ function parseCSV(file) {
   });
 
 }
+
 
 async function convertStops() {
 
@@ -83,6 +87,7 @@ async function convertStops() {
 
 }
 
+
 async function convertRoutes() {
 
   const routes = await parseCSV("routes.txt");
@@ -103,6 +108,7 @@ async function convertRoutes() {
 
 }
 
+
 async function convertShapes() {
 
   const shapes = await parseCSV("shapes.txt");
@@ -110,9 +116,8 @@ async function convertShapes() {
   const routes = await parseCSV("routes.txt");
 
   const routeMap = {};
-
-  routes.forEach(route => {
-    routeMap[route.route_id] = route;
+  routes.forEach(r => {
+    routeMap[r.route_id] = r;
   });
 
   const routeShapes = {};
@@ -200,13 +205,13 @@ async function convertShapes() {
 
 }
 
+
 async function convertTodayStopTimes() {
 
   const stopTimes = await parseCSV("stop_times.txt");
   const trips = await parseCSV("trips.txt");
   const calendar = await parseCSV("calendar.txt");
 
-  // timezone Europa/Roma
   const today = new Date(
     new Date().toLocaleString("en-US", {
       timeZone: "Europe/Rome"
@@ -275,6 +280,7 @@ async function convertTodayStopTimes() {
 
 }
 
+
 async function convertStopRoutes() {
 
   const stopTimes = await parseCSV("stop_times.txt");
@@ -316,6 +322,76 @@ async function convertStopRoutes() {
 
 }
 
+
+async function convertRouteTerminals() {
+
+  const stopTimes = await parseCSV("stop_times.txt");
+  const trips = await parseCSV("trips.txt");
+  const stops = await parseCSV("stops.txt");
+
+  const tripRouteMap = {};
+
+  trips.forEach(trip => {
+    tripRouteMap[trip.trip_id] = trip.route_id;
+  });
+
+  const stopNames = {};
+  stops.forEach(stop => {
+    stopNames[stop.stop_id] = stop.stop_name;
+  });
+
+  const routeStops = {};
+
+  stopTimes.forEach(st => {
+
+    const route_id = tripRouteMap[st.trip_id];
+    if (!route_id) return;
+
+    if (!routeStops[route_id])
+      routeStops[route_id] = [];
+
+    routeStops[route_id].push({
+      stop_id: st.stop_id,
+      seq: parseInt(st.stop_sequence)
+    });
+
+  });
+
+  const terminals = {};
+
+  Object.entries(routeStops).forEach(
+    ([route_id, stops]) => {
+
+      stops.sort((a,b)=>a.seq-b.seq);
+
+      const first = stops[0];
+      const last = stops[stops.length-1];
+
+      terminals[route_id] = {
+
+        A:{
+          stop_id:first.stop_id,
+          name:stopNames[first.stop_id]
+        },
+
+        B:{
+          stop_id:last.stop_id,
+          name:stopNames[last.stop_id]
+        }
+
+      };
+
+    }
+  );
+
+  fs.writeFileSync(
+    `${OUTPUT_PATH}/route_terminals.json`,
+    JSON.stringify(terminals)
+  );
+
+}
+
+
 async function run() {
 
   if (!fs.existsSync("./public"))
@@ -336,6 +412,7 @@ async function run() {
   await convertShapes();
   await convertTodayStopTimes();
   await convertStopRoutes();
+  await convertRouteTerminals();
 
   console.log("✅ GTFS updated successfully");
 
