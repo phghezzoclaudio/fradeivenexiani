@@ -2,61 +2,48 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-// cache 1 ora
+/* cache server 1 ora */
 export const revalidate = 3600;
+
+function readJSON(base: string, file: string) {
+
+  const filePath = path.join(base, file);
+
+  if (!fs.existsSync(filePath)) {
+    console.warn("File mancante:", file);
+    return null;
+  }
+
+  return JSON.parse(
+    fs.readFileSync(filePath, "utf8")
+  );
+
+}
 
 export async function GET() {
 
   try {
 
-    const base = path.join(
-      process.cwd(),
-      "public",
-      "data"
-    );
+    const base =
+      path.join(process.cwd(), "public", "data");
 
-    const shapes = JSON.parse(
-      fs.readFileSync(
-        path.join(base, "shapes.geojson"),
-        "utf8"
-      )
-    );
+    const shapes =
+      readJSON(base, "shapes.geojson");
 
-    const stops = JSON.parse(
-      fs.readFileSync(
-        path.join(base, "stops.geojson"),
-        "utf8"
-      )
-    );
+    const stops =
+      readJSON(base, "stops.geojson");
 
-    const routes = JSON.parse(
-      fs.readFileSync(
-        path.join(base, "routes.geojson"),
-        "utf8"
-      )
-    );
+    const routes =
+      readJSON(base, "routes.geojson");
 
-    const todayStopTimes = JSON.parse(
-      fs.readFileSync(
-        path.join(base, "today_stop_times.json"),
-        "utf8"
-      )
-    );
+    const todayStopTimes =
+      readJSON(base, "today_stop_times.json");
 
-    const stopRoutes = JSON.parse(
-      fs.readFileSync(
-        path.join(base, "stop_routes.json"),
-        "utf8"
-      )
-    );
+    const stopRoutes =
+      readJSON(base, "stop_routes.json");
 
-    // 🆕 capolinea reali
-    const terminals = JSON.parse(
-      fs.readFileSync(
-        path.join(base, "route_terminals.json"),
-        "utf8"
-      )
-    );
+    const terminals =
+      readJSON(base, "route_terminals.json");
 
     return NextResponse.json({
       shapes,

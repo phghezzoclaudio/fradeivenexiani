@@ -157,7 +157,6 @@ async function convertShapes() {
       shapeSet.forEach(shape_id => {
 
         const pts = groupedShapes[shape_id];
-
         if (!pts) return;
 
         if (pts.length > maxPoints) {
@@ -297,7 +296,6 @@ async function convertStopRoutes() {
   stopTimes.forEach(st => {
 
     const route_id = tripRouteMap[st.trip_id];
-
     if (!route_id) return;
 
     if (!stopRoutes[st.stop_id])
@@ -329,43 +327,64 @@ async function convertRouteTerminals() {
   const trips = await parseCSV("trips.txt");
   const stops = await parseCSV("stops.txt");
 
-  const tripRouteMap = {};
-
-  trips.forEach(trip => {
-    tripRouteMap[trip.trip_id] = trip.route_id;
-  });
-
   const stopNames = {};
+
   stops.forEach(stop => {
     stopNames[stop.stop_id] = stop.stop_name;
   });
 
-  const routeStops = {};
+  const tripStops = {};
 
   stopTimes.forEach(st => {
 
-    const route_id = tripRouteMap[st.trip_id];
-    if (!route_id) return;
+    if (!tripStops[st.trip_id])
+      tripStops[st.trip_id] = [];
 
-    if (!routeStops[route_id])
-      routeStops[route_id] = [];
-
-    routeStops[route_id].push({
+    tripStops[st.trip_id].push({
       stop_id: st.stop_id,
       seq: parseInt(st.stop_sequence)
     });
 
   });
 
+  const routeTrips = {};
+
+  trips.forEach(trip => {
+
+    if (!routeTrips[trip.route_id])
+      routeTrips[trip.route_id] = [];
+
+    routeTrips[trip.route_id].push(trip.trip_id);
+
+  });
+
   const terminals = {};
 
-  Object.entries(routeStops).forEach(
-    ([route_id, stops]) => {
+  Object.entries(routeTrips).forEach(
+    ([route_id, tripIds]) => {
 
-      stops.sort((a,b)=>a.seq-b.seq);
+      let bestTrip = null;
+      let maxStops = 0;
 
-      const first = stops[0];
-      const last = stops[stops.length-1];
+      tripIds.forEach(trip_id => {
+
+        const stops = tripStops[trip_id];
+        if (!stops) return;
+
+        if (stops.length > maxStops) {
+          maxStops = stops.length;
+          bestTrip = stops;
+        }
+
+      });
+
+      if (!bestTrip) return;
+
+      const ordered =
+        bestTrip.sort((a,b)=>a.seq-b.seq);
+
+      const first = ordered[0];
+      const last = ordered[ordered.length-1];
 
       terminals[route_id] = {
 
@@ -392,6 +411,50 @@ async function convertRouteTerminals() {
 }
 
 
+async function convertRouteStops() {
+
+  const stopTimes = await parseCSV("stop_times.txt");
+  const trips = await parseCSV("trips.txt");
+
+  const tripRouteMap = {};
+
+  trips.forEach(trip => {
+    tripRouteMap[trip.trip_id] = trip.route_id;
+  });
+
+  const routeStops = {};
+
+  stopTimes.forEach(st => {
+
+    const route_id = tripRouteMap[st.trip_id];
+    if (!route_id) return;
+
+    if (!routeStops[route_id])
+      routeStops[route_id] = [];
+
+    routeStops[route_id].push({
+      stop_id: st.stop_id,
+      seq: parseInt(st.stop_sequence)
+    });
+
+  });
+
+  Object.keys(routeStops).forEach(route_id => {
+
+    routeStops[route_id].sort(
+      (a,b)=>a.seq-b.seq
+    );
+
+  });
+
+  fs.writeFileSync(
+    `${OUTPUT_PATH}/route_stops.json`,
+    JSON.stringify(routeStops)
+  );
+
+}
+
+
 async function run() {
 
   if (!fs.existsSync("./public"))
@@ -413,6 +476,7 @@ async function run() {
   await convertTodayStopTimes();
   await convertStopRoutes();
   await convertRouteTerminals();
+  await convertRouteStops();
 
   console.log("✅ GTFS updated successfully");
 

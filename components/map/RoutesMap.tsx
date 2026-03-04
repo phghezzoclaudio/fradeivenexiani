@@ -11,7 +11,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { FeatureCollection } from "geojson";
 
-/* calcola prossime partenze */
+
+/* prossimi passaggi */
 function getUpcomingTimes(times: any[], limit = 6) {
 
   const now = new Date();
@@ -45,6 +46,8 @@ function getUpcomingTimes(times: any[], limit = 6) {
     .slice(0, limit);
 }
 
+
+/* zoom automatico */
 function ZoomTo({ geojson }: { geojson: FeatureCollection }) {
 
   const map = useMap();
@@ -57,9 +60,7 @@ function ZoomTo({ geojson }: { geojson: FeatureCollection }) {
     const bounds = layer.getBounds();
 
     if (bounds.isValid()) {
-      map.fitBounds(bounds, {
-        padding: [80, 80]
-      });
+      map.fitBounds(bounds, { padding: [80, 80] });
     }
 
   }, [geojson, map]);
@@ -67,9 +68,9 @@ function ZoomTo({ geojson }: { geojson: FeatureCollection }) {
   return null;
 }
 
+
 export default function RoutesMap({
-  selectedRoute,
-  selectedTerminal
+  selectedRoute
 }: {
   selectedRoute: string | null;
   selectedTerminal: string | null;
@@ -86,6 +87,7 @@ export default function RoutesMap({
 
   const [stopRoutes, setStopRoutes] =
     useState<Record<string, string[]>>({});
+
 
   useEffect(() => {
 
@@ -105,9 +107,10 @@ export default function RoutesMap({
 
   }, []);
 
+
   if (!shapes || !stops) return null;
 
-  /* route_id della linea */
+
   const routeIds =
     shapes.features
       .filter(
@@ -116,7 +119,7 @@ export default function RoutesMap({
       )
       .map((f: any) => f.properties?.route_id);
 
-  /* percorso linea */
+
   const filteredShapes: FeatureCollection = {
     type: "FeatureCollection",
     features: shapes.features.filter(
@@ -125,7 +128,7 @@ export default function RoutesMap({
     )
   };
 
-  /* fermate linea */
+
   const filteredStops: FeatureCollection = {
     type: "FeatureCollection",
     features: stops.features.filter((f: any) => {
@@ -144,7 +147,9 @@ export default function RoutesMap({
     })
   };
 
+
   return (
+
     <div style={{ flex: 1 }}>
 
       <MapContainer
@@ -161,28 +166,32 @@ export default function RoutesMap({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
+
         {/* LINEA */}
         {selectedRoute &&
           filteredShapes.features.length > 0 && (
+
           <GeoJSON
             data={filteredShapes}
             style={(f: any) => ({
               color: `#${f.properties?.route_color || "0066cc"}`,
-              weight: 6,
-              opacity: 0.9
+              weight: 6
             })}
           />
+
         )}
+
 
         {/* FERMATE */}
         {selectedRoute &&
           filteredStops.features.length > 0 && (
+
           <GeoJSON
             data={filteredStops}
             pointToLayer={(feature: any, latlng) =>
               L.circleMarker(latlng, {
                 radius: 7,
-                fillColor: "#ffffff",
+                fillColor: "#fff",
                 color: "#000",
                 weight: 2,
                 fillOpacity: 1
@@ -207,14 +216,14 @@ export default function RoutesMap({
                       : `${s.minutes} min`;
 
                   return `
-                  <div style="
-                    font-size:12px;
-                    display:flex;
-                    justify-content:space-between;
-                  ">
-                    <span>${s.arrival}</span>
-                    <span style="font-weight:600">${min}</span>
-                  </div>
+                    <div style="
+                      display:flex;
+                      justify-content:space-between;
+                      font-size:12px
+                    ">
+                      <span>${s.arrival}</span>
+                      <span><b>${min}</b></span>
+                    </div>
                   `;
                 })
                 .join("");
@@ -225,20 +234,21 @@ export default function RoutesMap({
                   <div style="
                     font-weight:700;
                     font-size:14px;
-                    margin-bottom:6px;">
+                    margin-bottom:6px
+                  ">
                     ${feature.properties?.stop_name}
                   </div>
 
-                  <div style="font-size:12px;color:#444;">
-                    ${html || "Nessun orario disponibile"}
-                  </div>
+                  ${html || "Nessun passaggio"}
 
                 </div>
               `);
 
             }}
           />
+
         )}
+
 
         {/* ZOOM */}
         {selectedRoute &&
@@ -249,5 +259,7 @@ export default function RoutesMap({
       </MapContainer>
 
     </div>
+
   );
+
 }
