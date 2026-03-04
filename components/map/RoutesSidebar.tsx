@@ -90,7 +90,7 @@ export default function RoutesSidebar({
             {/* linea */}
             <div
               onClick={() =>
-                onSelectRoute(route.route_id)
+                onSelectRoute(route.route_short_name)
               }
               style={{
                 textAlign: "center",
