@@ -25,7 +25,6 @@ export default function RoutesSidebar({
             (f: any) => f.properties
           );
 
-        // deduplicazione per numero linea
         const uniqueRoutes = Array.from(
           new Map(
             routes.map((r: any) => [
@@ -35,7 +34,6 @@ export default function RoutesSidebar({
           ).values()
         );
 
-        // ordinamento numerico
         uniqueRoutes.sort((a: any, b: any) =>
           a.route_short_name.localeCompare(
             b.route_short_name,
@@ -54,6 +52,7 @@ export default function RoutesSidebar({
     <div
       style={{
         width: 120,
+        background: "#f8f9fa",
         borderRight: "1px solid #ddd",
         padding: 10,
         overflowY: "auto"
@@ -79,14 +78,15 @@ export default function RoutesSidebar({
             }
             style={{
               textAlign: "center",
-              padding: "6px 0",
-              marginBottom: 6,
+              padding: "8px 0",
+              marginBottom: 8,
               cursor: "pointer",
-              borderRadius: 4,
-              fontWeight: 600,
+              borderRadius: 6,
+              fontWeight: 700,
               border: `2px solid ${color}`,
-              background: active ? color : "transparent",
-              color: active ? "#fff" : "#000"
+              background: active ? color : "#fff",
+              color: active ? "#fff" : color,
+              transition: "all 0.2s"
             }}
           >
             {route.route_short_name}

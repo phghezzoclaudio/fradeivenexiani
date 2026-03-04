@@ -15,18 +15,18 @@ export default function RoutesLayout() {
     useState<string | null>(null);
 
   return (
-    <div style={{
-      display: "flex",
-      height: "100vh"
-    }}>
-
+    <div
+      style={{
+        display: "flex",
+        height: "calc(100vh - 64px)"
+      }}
+    >
       <RoutesSidebar
         selectedRoute={selectedRoute}
         onSelectRoute={setSelectedRoute}
       />
 
       <RoutesMap selectedRoute={selectedRoute} />
-
     </div>
   );
 }

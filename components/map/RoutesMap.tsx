@@ -23,7 +23,9 @@ function ZoomTo({ geojson }: { geojson: FeatureCollection }) {
     const bounds = layer.getBounds();
 
     if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [80, 80] });
+      map.fitBounds(bounds, {
+        padding: [80, 80]
+      });
     }
 
   }, [geojson, map]);
@@ -69,7 +71,7 @@ export default function RoutesMap({
 
   if (!shapes || !stops) return null;
 
-  // 🔵 filtra percorso linea
+  // percorso linea
   const filteredShapes: FeatureCollection = {
     type: "FeatureCollection",
     features: shapes.features.filter(
@@ -79,7 +81,7 @@ export default function RoutesMap({
     )
   };
 
-  // 🔵 filtra fermate linea
+  // fermate linea
   const filteredStops: FeatureCollection = {
     type: "FeatureCollection",
     features: stops.features.filter((f: any) => {
@@ -107,6 +109,7 @@ export default function RoutesMap({
       >
 
         <TileLayer
+          attribution="© OpenStreetMap"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
@@ -116,8 +119,11 @@ export default function RoutesMap({
           <GeoJSON
             data={filteredShapes}
             style={(f: any) => ({
+
               color: `#${f.properties?.route_color || "0066cc"}`,
-              weight: 6
+              weight: 6,
+              opacity: 0.9
+
             })}
           />
         )}
@@ -129,11 +135,13 @@ export default function RoutesMap({
             data={filteredStops}
             pointToLayer={(feature: any, latlng) =>
               L.circleMarker(latlng, {
-                radius: 6,
-                fillColor: "#fff",
+
+                radius: 7,
+                fillColor: "#ffffff",
                 color: "#000",
                 weight: 2,
                 fillOpacity: 1
+
               })
             }
             onEachFeature={(feature: any, layer) => {
@@ -146,14 +154,28 @@ export default function RoutesMap({
               const html = schedule
                 .slice(0, 6)
                 .map((s: any) =>
-                  `<div>${s.arrival}</div>`
+                  `<div style="font-size:12px">${s.arrival}</div>`
                 )
                 .join("");
 
               layer.bindPopup(`
-                <div>
-                  <h4>${feature.properties?.stop_name}</h4>
-                  ${html || "Nessun orario disponibile"}
+                <div style="min-width:160px">
+
+                  <div style="
+                    font-weight:700;
+                    font-size:14px;
+                    margin-bottom:6px;
+                  ">
+                    ${feature.properties?.stop_name}
+                  </div>
+
+                  <div style="
+                    font-size:12px;
+                    color:#444;
+                  ">
+                    ${html || "Nessun orario disponibile"}
+                  </div>
+
                 </div>
               `);
 

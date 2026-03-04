@@ -4,13 +4,14 @@ const unzipper = require("unzipper");
 const csv = require("csv-parser");
 
 const GTFS_URL =
-  "https://actv.avmspa.it/sites/default/files/attachments/opendata/navigazione/actv__nav.zip";
+"https://actv.avmspa.it/sites/default/files/attachments/opendata/navigazione/actv__nav.zip";
 
 const ZIP_PATH = "./actv_nav.zip";
 const EXTRACT_PATH = "./gtfs";
 const OUTPUT_PATH = "./public/data";
 
 function downloadGTFS() {
+
   return new Promise((resolve, reject) => {
 
     const file = fs.createWriteStream(ZIP_PATH);
@@ -26,13 +27,13 @@ function downloadGTFS() {
     }).on("error", reject);
 
   });
+
 }
 
 function extractZip() {
 
-  if (fs.existsSync(EXTRACT_PATH)) {
+  if (fs.existsSync(EXTRACT_PATH))
     fs.rmSync(EXTRACT_PATH, { recursive: true, force: true });
-  }
 
   return fs
     .createReadStream(ZIP_PATH)
@@ -106,14 +107,20 @@ async function convertShapes() {
 
   const shapes = await parseCSV("shapes.txt");
   const trips = await parseCSV("trips.txt");
+  const routes = await parseCSV("routes.txt");
+
+  const routeMap = {};
+
+  routes.forEach(route => {
+    routeMap[route.route_id] = route;
+  });
 
   const routeShapes = {};
 
   trips.forEach(trip => {
 
-    if (!routeShapes[trip.route_id]) {
+    if (!routeShapes[trip.route_id])
       routeShapes[trip.route_id] = new Set();
-    }
 
     routeShapes[trip.route_id].add(trip.shape_id);
 
@@ -123,9 +130,8 @@ async function convertShapes() {
 
   shapes.forEach(row => {
 
-    if (!groupedShapes[row.shape_id]) {
+    if (!groupedShapes[row.shape_id])
       groupedShapes[row.shape_id] = [];
-    }
 
     groupedShapes[row.shape_id].push({
       lon: parseFloat(row.shape_pt_lon),
@@ -158,8 +164,11 @@ async function convertShapes() {
 
       if (!bestShape) return;
 
-      const ordered = groupedShapes[bestShape]
-        .sort((a, b) => a.seq - b.seq);
+      const ordered =
+        groupedShapes[bestShape]
+        .sort((a,b) => a.seq - b.seq);
+
+      const route = routeMap[route_id] || {};
 
       features.push({
         type: "Feature",
@@ -172,6 +181,8 @@ async function convertShapes() {
         },
         properties: {
           route_id,
+          route_short_name: route.route_short_name,
+          route_color: route.route_color,
           shape_id: bestShape
         }
       });
@@ -195,16 +206,24 @@ async function convertTodayStopTimes() {
   const trips = await parseCSV("trips.txt");
   const calendar = await parseCSV("calendar.txt");
 
-  const today = new Date();
+  // timezone Europa/Roma
+  const today = new Date(
+    new Date().toLocaleString("en-US", {
+      timeZone: "Europe/Rome"
+    })
+  );
+
   const yyyymmdd =
-    today.toISOString().slice(0, 10).replace(/-/g, "");
+    today.toISOString().slice(0,10).replace(/-/g,"");
+
   const weekday = today.getDay();
 
   const validServices = new Set();
 
   calendar.forEach(row => {
 
-    if (yyyymmdd < row.start_date || yyyymmdd > row.end_date)
+    if (yyyymmdd < row.start_date ||
+        yyyymmdd > row.end_date)
       return;
 
     const days = [
@@ -217,9 +236,8 @@ async function convertTodayStopTimes() {
       row.saturday
     ];
 
-    if (days[weekday] === "1") {
+    if (days[weekday] === "1")
       validServices.add(row.service_id);
-    }
 
   });
 
@@ -227,9 +245,8 @@ async function convertTodayStopTimes() {
 
   trips.forEach(trip => {
 
-    if (validServices.has(trip.service_id)) {
+    if (validServices.has(trip.service_id))
       validTrips.add(trip.trip_id);
-    }
 
   });
 
@@ -277,9 +294,8 @@ async function convertStopRoutes() {
 
     if (!route_id) return;
 
-    if (!stopRoutes[st.stop_id]) {
+    if (!stopRoutes[st.stop_id])
       stopRoutes[st.stop_id] = new Set();
-    }
 
     stopRoutes[st.stop_id].add(route_id);
 
