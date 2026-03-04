@@ -1,24 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import RoutesSidebar from "./RoutesSidebar";
-import RoutesMap from "./RoutesMap";
+
+const RoutesMap = dynamic(
+  () => import("./RoutesMap"),
+  { ssr: false }
+);
 
 export default function RoutesLayout() {
 
-  const [selectedRoute, setSelectedRoute] =
+  const [selectedRoute,setSelectedRoute] =
     useState<string | null>(null);
 
-  const [selectedTerminal, setSelectedTerminal] =
+  const [selectedTerminal,setSelectedTerminal] =
     useState<string | null>(null);
 
   return (
 
     <div
       style={{
-        display: "flex",
-        height: "calc(100vh - 70px)",
-        marginTop: 70
+        display:"flex",
+        height:"calc(100vh - 70px)",
+        marginTop:70
       }}
     >
 
