@@ -25,7 +25,7 @@ export default function RoutesSidebar({
             (f: any) => f.properties
           );
 
-        // 🔵 rimuove duplicati per numero linea
+        // deduplicazione per numero linea
         const uniqueRoutes = Array.from(
           new Map(
             routes.map((r: any) => [
@@ -35,7 +35,7 @@ export default function RoutesSidebar({
           ).values()
         );
 
-        // 🔵 ordina numericamente
+        // ordinamento numerico
         uniqueRoutes.sort((a: any, b: any) =>
           a.route_short_name.localeCompare(
             b.route_short_name,
@@ -68,14 +68,14 @@ export default function RoutesSidebar({
             : "#888";
 
         const active =
-          selectedRoute === route.route_id;
+          selectedRoute === route.route_short_name;
 
         return (
 
           <div
             key={route.route_short_name}
             onClick={() =>
-              onSelectRoute(route.route_id)
+              onSelectRoute(route.route_short_name)
             }
             style={{
               textAlign: "center",

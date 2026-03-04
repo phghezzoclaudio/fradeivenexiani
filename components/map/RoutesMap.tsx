@@ -17,11 +17,14 @@ function ZoomTo({ geojson }: { geojson: FeatureCollection }) {
 
   useEffect(() => {
 
-    const layer = L.geoJSON(geojson);
+    if (!geojson?.features?.length) return;
 
-    map.fitBounds(layer.getBounds(), {
-      padding: [80, 80]
-    });
+    const layer = L.geoJSON(geojson);
+    const bounds = layer.getBounds();
+
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [80, 80] });
+    }
 
   }, [geojson, map]);
 
@@ -57,23 +60,26 @@ export default function RoutesMap({
         setTodayStopTimes(data.todayStopTimes);
         setStopRoutes(data.stopRoutes);
 
-      });
+      })
+      .catch(err =>
+        console.error("Errore caricamento dati:", err)
+      );
 
   }, []);
 
   if (!shapes || !stops) return null;
 
-  // 🔵 percorso linea
+  // 🔵 filtra percorso linea
   const filteredShapes: FeatureCollection = {
     type: "FeatureCollection",
     features: shapes.features.filter(
       (f: any) =>
         selectedRoute &&
-        f.properties.route_id === selectedRoute
+        f.properties?.route_id === selectedRoute
     )
   };
 
-  // 🔵 fermate della linea
+  // 🔵 filtra fermate linea
   const filteredStops: FeatureCollection = {
     type: "FeatureCollection",
     features: stops.features.filter((f: any) => {
@@ -81,7 +87,7 @@ export default function RoutesMap({
       if (!selectedRoute) return false;
 
       const routes =
-        stopRoutes[f.properties.stop_id];
+        stopRoutes[f.properties?.stop_id];
 
       return routes?.includes(selectedRoute);
 
@@ -105,18 +111,20 @@ export default function RoutesMap({
         />
 
         {/* LINEA */}
-        {selectedRoute && (
+        {selectedRoute &&
+          filteredShapes.features.length > 0 && (
           <GeoJSON
             data={filteredShapes}
             style={(f: any) => ({
-              color: `#${f.properties.route_color || "0066cc"}`,
+              color: `#${f.properties?.route_color || "0066cc"}`,
               weight: 6
             })}
           />
         )}
 
         {/* FERMATE */}
-        {selectedRoute && (
+        {selectedRoute &&
+          filteredStops.features.length > 0 && (
           <GeoJSON
             data={filteredStops}
             pointToLayer={(feature: any, latlng) =>
@@ -132,7 +140,7 @@ export default function RoutesMap({
 
               const schedule =
                 todayStopTimes[
-                  feature.properties.stop_id
+                  feature.properties?.stop_id
                 ] || [];
 
               const html = schedule
@@ -144,7 +152,7 @@ export default function RoutesMap({
 
               layer.bindPopup(`
                 <div>
-                  <h4>${feature.properties.stop_name}</h4>
+                  <h4>${feature.properties?.stop_name}</h4>
                   ${html || "Nessun orario disponibile"}
                 </div>
               `);
@@ -154,7 +162,8 @@ export default function RoutesMap({
         )}
 
         {/* ZOOM */}
-        {selectedRoute && (
+        {selectedRoute &&
+          filteredShapes.features.length > 0 && (
           <ZoomTo geojson={filteredShapes} />
         )}
 
