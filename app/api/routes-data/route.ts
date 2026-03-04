@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-// cache 1 ora (migliora performance)
+// cache 1 ora
 export const revalidate = 3600;
 
 export async function GET() {
@@ -50,12 +50,21 @@ export async function GET() {
       )
     );
 
+    // 🆕 capolinea reali
+    const terminals = JSON.parse(
+      fs.readFileSync(
+        path.join(base, "route_terminals.json"),
+        "utf8"
+      )
+    );
+
     return NextResponse.json({
       shapes,
       stops,
       routes,
       todayStopTimes,
-      stopRoutes
+      stopRoutes,
+      terminals
     });
 
   } catch (error: any) {

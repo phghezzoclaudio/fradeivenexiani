@@ -4,15 +4,20 @@ import { useEffect, useState } from "react";
 
 interface Props {
   selectedRoute: string | null;
-  onSelectRoute: (id: string | null) => void;
+  selectedTerminal: string | null;
+  onSelectRoute: (route: string) => void;
+  onSelectTerminal: (terminal: string) => void;
 }
 
 export default function RoutesSidebar({
   selectedRoute,
-  onSelectRoute
+  selectedTerminal,
+  onSelectRoute,
+  onSelectTerminal
 }: Props) {
 
   const [routes, setRoutes] = useState<any[]>([]);
+  const [terminals, setTerminals] = useState<any>({});
 
   useEffect(() => {
 
@@ -27,7 +32,6 @@ export default function RoutesSidebar({
             (f: any) => f.properties
           );
 
-        // rimuove duplicati
         const uniqueRoutes = Array.from(
           new Map(
             routes
@@ -39,7 +43,6 @@ export default function RoutesSidebar({
           ).values()
         );
 
-        // ordina numericamente
         uniqueRoutes.sort((a: any, b: any) =>
           a.route_short_name.localeCompare(
             b.route_short_name,
@@ -49,18 +52,17 @@ export default function RoutesSidebar({
         );
 
         setRoutes(uniqueRoutes);
+        setTerminals(data.terminals || {});
 
-      })
-      .catch(err =>
-        console.error("Errore routes:", err)
-      );
+      });
 
   }, []);
 
   return (
+
     <div
       style={{
-        width: 120,
+        width: 200,
         background: "#f8f9fa",
         borderRight: "1px solid #ddd",
         padding: 10,
@@ -76,40 +78,81 @@ export default function RoutesSidebar({
             : "#666";
 
         const active =
-          selectedRoute === route.route_short_name;
+          selectedRoute === route.route_id;
+
+        const routeTerminals =
+          terminals[route.route_id];
 
         return (
 
-          <div
-            key={route.route_short_name}
-            onClick={() => {
+          <div key={route.route_id}>
 
-              // forza aggiornamento linea
-              if (selectedRoute === route.route_short_name) {
-                onSelectRoute(null);
-                setTimeout(() =>
-                  onSelectRoute(route.route_short_name),
-                  50
-                );
-              } else {
-                onSelectRoute(route.route_short_name);
+            {/* linea */}
+            <div
+              onClick={() =>
+                onSelectRoute(route.route_id)
               }
+              style={{
+                textAlign: "center",
+                padding: "8px 0",
+                marginBottom: 6,
+                cursor: "pointer",
+                borderRadius: 6,
+                fontWeight: 700,
+                border: `2px solid ${color}`,
+                background: active ? color : "#fff",
+                color: active ? "#fff" : color
+              }}
+            >
+              {route.route_short_name}
+            </div>
 
-            }}
-            style={{
-              textAlign: "center",
-              padding: "8px 0",
-              marginBottom: 8,
-              cursor: "pointer",
-              borderRadius: 6,
-              fontWeight: 700,
-              border: `2px solid ${color}`,
-              background: active ? color : "#fff",
-              color: active ? "#fff" : color,
-              transition: "all 0.2s"
-            }}
-          >
-            {route.route_short_name}
+            {/* direzioni */}
+            {active && routeTerminals && (
+
+              <div
+                style={{
+                  marginBottom: 12,
+                  paddingLeft: 10,
+                  fontSize: 13
+                }}
+              >
+
+                <div
+                  style={{
+                    cursor: "pointer",
+                    marginBottom: 4,
+                    fontWeight:
+                      selectedTerminal === "A"
+                        ? 700
+                        : 400
+                  }}
+                  onClick={() =>
+                    onSelectTerminal("A")
+                  }
+                >
+                  → {routeTerminals.A.name}
+                </div>
+
+                <div
+                  style={{
+                    cursor: "pointer",
+                    fontWeight:
+                      selectedTerminal === "B"
+                        ? 700
+                        : 400
+                  }}
+                  onClick={() =>
+                    onSelectTerminal("B")
+                  }
+                >
+                  → {routeTerminals.B.name}
+                </div>
+
+              </div>
+
+            )}
+
           </div>
 
         );
@@ -117,5 +160,7 @@ export default function RoutesSidebar({
       })}
 
     </div>
+
   );
+
 }
