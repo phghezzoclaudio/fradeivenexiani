@@ -18,15 +18,18 @@ export default function RoutesLayout() {
     <div
       style={{
         display: "flex",
-        height: "calc(100vh - 64px)"
+        height: "calc(100vh - 70px)", // spazio navbar
+        marginTop: "70px"
       }}
     >
+
       <RoutesSidebar
         selectedRoute={selectedRoute}
         onSelectRoute={setSelectedRoute}
       />
 
       <RoutesMap selectedRoute={selectedRoute} />
+
     </div>
   );
 }
