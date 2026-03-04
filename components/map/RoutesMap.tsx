@@ -12,13 +12,17 @@ import "leaflet/dist/leaflet.css";
 import type { FeatureCollection } from "geojson";
 
 function ZoomTo({ geojson }: { geojson: FeatureCollection }) {
+
   const map = useMap();
 
   useEffect(() => {
+
     const layer = L.geoJSON(geojson);
+
     map.fitBounds(layer.getBounds(), {
-      padding: [40, 40]
+      padding: [80, 80]
     });
+
   }, [geojson, map]);
 
   return null;
@@ -36,51 +40,26 @@ export default function RoutesMap({
   const [stops, setStops] =
     useState<FeatureCollection | null>(null);
 
-  const [routes, setRoutes] = useState<any[]>([]);
   const [todayStopTimes, setTodayStopTimes] =
     useState<Record<string, any[]>>({});
 
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
+
     fetch("/api/routes-data")
       .then(r => r.json())
       .then(data => {
+
         setShapes(data.shapes);
         setStops(data.stops);
+        setTodayStopTimes(data.todayStopTimes);
 
-        setRoutes(
-          data.routes?.features
-            ? data.routes.features.map(
-                (f: any) => f.properties
-              )
-            : []
-        );
-
-        setTodayStopTimes(data.todayStopTimes || {});
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
       });
-  }, []);
 
-  if (loading) {
-    return (
-      <div style={{
-        flex: 1,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }}>
-        Caricamento mappa...
-      </div>
-    );
-  }
+  }, []);
 
   if (!shapes || !stops) return null;
 
+  // 🔵 mostra solo linea selezionata
   const filteredShapes: FeatureCollection = {
     type: "FeatureCollection",
     features: selectedRoute
@@ -88,50 +67,58 @@ export default function RoutesMap({
           (f: any) =>
             f.properties.route_id === selectedRoute
         )
-      : shapes.features
+      : []
   };
 
+  // 🔵 mostra solo fermate con orari della linea
   const filteredStops: FeatureCollection = {
     type: "FeatureCollection",
     features: selectedRoute
-      ? stops.features.filter(
-          (f: any) =>
-            f.properties.routes?.includes(selectedRoute)
+      ? stops.features.filter((f: any) =>
+          todayStopTimes[f.properties.stop_id]
         )
       : []
   };
 
   return (
     <div style={{ flex: 1 }}>
+
       <MapContainer
         center={[45.437, 12.335]}
         zoom={13}
-        style={{ height: "100%", width: "100%" }}
+        style={{
+          height: "100%",
+          width: "100%"
+        }}
       >
+
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* LINEE */}
-        <GeoJSON
-          data={filteredShapes}
-          style={(f: any) => ({
-            color: `#${f.properties.route_color || "0066cc"}`,
-            weight: selectedRoute ? 6 : 3,
-            opacity:
-              selectedRoute &&
-              f.properties.route_id !== selectedRoute
-                ? 0.15
-                : 1
-          })}
-        />
+        {/* LINEA */}
+        {selectedRoute && (
+          <GeoJSON
+            data={filteredShapes}
+            style={(f: any) => ({
+              color: `#${f.properties.route_color || "0066cc"}`,
+              weight: 6
+            })}
+          />
+        )}
 
         {/* FERMATE */}
         {selectedRoute && (
           <GeoJSON
             data={filteredStops}
             pointToLayer={(feature: any, latlng) =>
-              L.circleMarker(latlng, { radius: 6 })
+              L.circleMarker(latlng, {
+                radius: 6,
+                fillColor: "#fff",
+                color: "#000",
+                weight: 2,
+                fillOpacity: 1
+              })
             }
             onEachFeature={(feature: any, layer) => {
 
@@ -142,11 +129,9 @@ export default function RoutesMap({
 
               const html = schedule
                 .slice(0, 6)
-                .map((s: any) => `
-                  <div style="margin:4px 0;">
-                    ${s.arrival}
-                  </div>
-                `)
+                .map((s: any) =>
+                  `<div>${s.arrival}</div>`
+                )
                 .join("");
 
               layer.bindPopup(`
@@ -155,14 +140,18 @@ export default function RoutesMap({
                   ${html || "Nessun orario disponibile"}
                 </div>
               `);
+
             }}
           />
         )}
 
+        {/* ZOOM AUTOMATICO */}
         {selectedRoute && (
           <ZoomTo geojson={filteredShapes} />
         )}
+
       </MapContainer>
+
     </div>
   );
 }

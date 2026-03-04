@@ -4,6 +4,7 @@ import path from "path";
 
 export async function GET() {
   try {
+
     const base = path.join(process.cwd(), "public", "data");
 
     const shapes = JSON.parse(
@@ -33,10 +34,13 @@ export async function GET() {
     });
 
   } catch (error: any) {
+
     console.error("API ERROR:", error);
+
     return NextResponse.json(
       { error: error.message },
       { status: 500 }
     );
+
   }
 }

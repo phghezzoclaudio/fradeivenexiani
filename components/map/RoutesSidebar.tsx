@@ -15,67 +15,61 @@ export default function RoutesSidebar({
   const [routes, setRoutes] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/gtfs/routes.geojson")
-      .then(res => res.json())
+
+    fetch("/api/routes-data")
+      .then(r => r.json())
       .then(data => {
-        const sorted = data.features
-          .map((f: any) => f.properties)
-          .sort((a: any, b: any) =>
-            a.route_short_name.localeCompare(
-              b.route_short_name,
-              undefined,
-              { numeric: true }
-            )
-          );
+
+        const sorted =
+          data.routes.features
+            .map((f: any) => f.properties)
+            .sort((a: any, b: any) =>
+              a.route_short_name.localeCompare(
+                b.route_short_name,
+                undefined,
+                { numeric: true }
+              )
+            );
 
         setRoutes(sorted);
+
       });
+
   }, []);
 
   return (
     <div style={{
-      width: 300,
+      width: 120,
       borderRight: "1px solid #ddd",
-      padding: 20,
+      padding: 10,
       overflowY: "auto"
     }}>
-      <h2>Linee</h2>
-
-      <button
-        onClick={() => onSelectRoute(null)}
-        style={{
-          marginBottom: 15,
-          fontWeight: !selectedRoute ? "bold" : "normal"
-        }}
-      >
-        Tutte le linee
-      </button>
 
       {routes.map(route => (
+
         <div
           key={route.route_id}
-          onClick={() => onSelectRoute(route.route_id)}
+          onClick={() =>
+            onSelectRoute(route.route_id)
+          }
           style={{
+            textAlign: "center",
             padding: "6px 0",
+            marginBottom: 4,
             cursor: "pointer",
-            fontWeight:
+            background:
               selectedRoute === route.route_id
-                ? "bold"
-                : "normal"
+                ? "#eee"
+                : "transparent",
+            borderRadius: 4,
+            fontWeight: 600
           }}
         >
-          <span style={{
-            background: `#${route.route_color}`,
-            color: "#fff",
-            padding: "2px 6px",
-            borderRadius: 4,
-            marginRight: 8
-          }}>
-            {route.route_short_name}
-          </span>
-          {route.route_long_name}
+          {route.route_short_name}
         </div>
+
       ))}
+
     </div>
   );
 }
