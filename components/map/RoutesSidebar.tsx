@@ -20,55 +20,81 @@ export default function RoutesSidebar({
       .then(r => r.json())
       .then(data => {
 
-        const sorted =
-          data.routes.features
-            .map((f: any) => f.properties)
-            .sort((a: any, b: any) =>
-              a.route_short_name.localeCompare(
-                b.route_short_name,
-                undefined,
-                { numeric: true }
-              )
-            );
+        const routes =
+          data.routes.features.map(
+            (f: any) => f.properties
+          );
 
-        setRoutes(sorted);
+        // 🔵 rimuove duplicati per numero linea
+        const uniqueRoutes = Array.from(
+          new Map(
+            routes.map((r: any) => [
+              r.route_short_name,
+              r
+            ])
+          ).values()
+        );
+
+        // 🔵 ordina numericamente
+        uniqueRoutes.sort((a: any, b: any) =>
+          a.route_short_name.localeCompare(
+            b.route_short_name,
+            undefined,
+            { numeric: true }
+          )
+        );
+
+        setRoutes(uniqueRoutes);
 
       });
 
   }, []);
 
   return (
-    <div style={{
-      width: 120,
-      borderRight: "1px solid #ddd",
-      padding: 10,
-      overflowY: "auto"
-    }}>
+    <div
+      style={{
+        width: 120,
+        borderRight: "1px solid #ddd",
+        padding: 10,
+        overflowY: "auto"
+      }}
+    >
 
-      {routes.map(route => (
+      {routes.map(route => {
 
-        <div
-          key={route.route_id}
-          onClick={() =>
-            onSelectRoute(route.route_id)
-          }
-          style={{
-            textAlign: "center",
-            padding: "6px 0",
-            marginBottom: 4,
-            cursor: "pointer",
-            background:
-              selectedRoute === route.route_id
-                ? "#eee"
-                : "transparent",
-            borderRadius: 4,
-            fontWeight: 600
-          }}
-        >
-          {route.route_short_name}
-        </div>
+        const color =
+          route.route_color
+            ? `#${route.route_color}`
+            : "#888";
 
-      ))}
+        const active =
+          selectedRoute === route.route_id;
+
+        return (
+
+          <div
+            key={route.route_short_name}
+            onClick={() =>
+              onSelectRoute(route.route_id)
+            }
+            style={{
+              textAlign: "center",
+              padding: "6px 0",
+              marginBottom: 6,
+              cursor: "pointer",
+              borderRadius: 4,
+              fontWeight: 600,
+              border: `2px solid ${color}`,
+              background: active ? color : "transparent",
+              color: active ? "#fff" : "#000"
+            }}
+          >
+            {route.route_short_name}
+          </div>
+
+        );
+
+      })}
 
     </div>
   );

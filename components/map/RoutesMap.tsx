@@ -43,6 +43,9 @@ export default function RoutesMap({
   const [todayStopTimes, setTodayStopTimes] =
     useState<Record<string, any[]>>({});
 
+  const [stopRoutes, setStopRoutes] =
+    useState<Record<string, string[]>>({});
+
   useEffect(() => {
 
     fetch("/api/routes-data")
@@ -52,6 +55,7 @@ export default function RoutesMap({
         setShapes(data.shapes);
         setStops(data.stops);
         setTodayStopTimes(data.todayStopTimes);
+        setStopRoutes(data.stopRoutes);
 
       });
 
@@ -59,25 +63,29 @@ export default function RoutesMap({
 
   if (!shapes || !stops) return null;
 
-  // 🔵 mostra solo linea selezionata
+  // 🔵 percorso linea
   const filteredShapes: FeatureCollection = {
     type: "FeatureCollection",
-    features: selectedRoute
-      ? shapes.features.filter(
-          (f: any) =>
-            f.properties.route_id === selectedRoute
-        )
-      : []
+    features: shapes.features.filter(
+      (f: any) =>
+        selectedRoute &&
+        f.properties.route_id === selectedRoute
+    )
   };
 
-  // 🔵 mostra solo fermate con orari della linea
+  // 🔵 fermate della linea
   const filteredStops: FeatureCollection = {
     type: "FeatureCollection",
-    features: selectedRoute
-      ? stops.features.filter((f: any) =>
-          todayStopTimes[f.properties.stop_id]
-        )
-      : []
+    features: stops.features.filter((f: any) => {
+
+      if (!selectedRoute) return false;
+
+      const routes =
+        stopRoutes[f.properties.stop_id];
+
+      return routes?.includes(selectedRoute);
+
+    })
   };
 
   return (
@@ -145,7 +153,7 @@ export default function RoutesMap({
           />
         )}
 
-        {/* ZOOM AUTOMATICO */}
+        {/* ZOOM */}
         {selectedRoute && (
           <ZoomTo geojson={filteredShapes} />
         )}

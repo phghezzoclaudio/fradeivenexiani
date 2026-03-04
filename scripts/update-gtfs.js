@@ -12,37 +12,52 @@ const OUTPUT_PATH = "./public/data";
 
 function downloadGTFS() {
   return new Promise((resolve, reject) => {
+
     const file = fs.createWriteStream(ZIP_PATH);
 
     https.get(GTFS_URL, response => {
+
       response.pipe(file);
+
       file.on("finish", () => {
         file.close(resolve);
       });
+
     }).on("error", reject);
+
   });
 }
 
 function extractZip() {
-  if (fs.existsSync(EXTRACT_PATH))
-    fs.rmSync(EXTRACT_PATH, { recursive: true, force: true });
 
-  return fs.createReadStream(ZIP_PATH)
+  if (fs.existsSync(EXTRACT_PATH)) {
+    fs.rmSync(EXTRACT_PATH, { recursive: true, force: true });
+  }
+
+  return fs
+    .createReadStream(ZIP_PATH)
     .pipe(unzipper.Extract({ path: EXTRACT_PATH }))
     .promise();
+
 }
 
 function parseCSV(file) {
+
   return new Promise(resolve => {
+
     const results = [];
+
     fs.createReadStream(`${EXTRACT_PATH}/${file}`)
       .pipe(csv())
       .on("data", data => results.push(data))
       .on("end", () => resolve(results));
+
   });
+
 }
 
 async function convertStops() {
+
   const stops = await parseCSV("stops.txt");
 
   const geojson = {
@@ -60,10 +75,15 @@ async function convertStops() {
     }))
   };
 
-  fs.writeFileSync(`${OUTPUT_PATH}/stops.geojson`, JSON.stringify(geojson));
+  fs.writeFileSync(
+    `${OUTPUT_PATH}/stops.geojson`,
+    JSON.stringify(geojson)
+  );
+
 }
 
 async function convertRoutes() {
+
   const routes = await parseCSV("routes.txt");
 
   const geojson = {
@@ -75,7 +95,11 @@ async function convertRoutes() {
     }))
   };
 
-  fs.writeFileSync(`${OUTPUT_PATH}/routes.geojson`, JSON.stringify(geojson));
+  fs.writeFileSync(
+    `${OUTPUT_PATH}/routes.geojson`,
+    JSON.stringify(geojson)
+  );
+
 }
 
 async function convertShapes() {
@@ -83,43 +107,77 @@ async function convertShapes() {
   const shapes = await parseCSV("shapes.txt");
   const trips = await parseCSV("trips.txt");
 
-  const shapeRouteMap = {};
+  const routeShapes = {};
+
   trips.forEach(trip => {
-    if (!shapeRouteMap[trip.shape_id]) {
-      shapeRouteMap[trip.shape_id] = trip.route_id;
+
+    if (!routeShapes[trip.route_id]) {
+      routeShapes[trip.route_id] = new Set();
     }
+
+    routeShapes[trip.route_id].add(trip.shape_id);
+
   });
 
-  const grouped = {};
+  const groupedShapes = {};
 
   shapes.forEach(row => {
-    if (!grouped[row.shape_id]) {
-      grouped[row.shape_id] = [];
+
+    if (!groupedShapes[row.shape_id]) {
+      groupedShapes[row.shape_id] = [];
     }
 
-    grouped[row.shape_id].push({
+    groupedShapes[row.shape_id].push({
       lon: parseFloat(row.shape_pt_lon),
       lat: parseFloat(row.shape_pt_lat),
       seq: parseInt(row.shape_pt_sequence)
     });
+
   });
 
-  const features = Object.keys(grouped).map(shape_id => {
-    const ordered = grouped[shape_id]
-      .sort((a, b) => a.seq - b.seq);
+  const features = [];
 
-    return {
-      type: "Feature",
-      geometry: {
-        type: "LineString",
-        coordinates: ordered.map(p => [p.lon, p.lat])
-      },
-      properties: {
-        shape_id,
-        route_id: shapeRouteMap[shape_id] || null
-      }
-    };
-  });
+  Object.entries(routeShapes).forEach(
+    ([route_id, shapeSet]) => {
+
+      let bestShape = null;
+      let maxPoints = 0;
+
+      shapeSet.forEach(shape_id => {
+
+        const pts = groupedShapes[shape_id];
+
+        if (!pts) return;
+
+        if (pts.length > maxPoints) {
+          maxPoints = pts.length;
+          bestShape = shape_id;
+        }
+
+      });
+
+      if (!bestShape) return;
+
+      const ordered = groupedShapes[bestShape]
+        .sort((a, b) => a.seq - b.seq);
+
+      features.push({
+        type: "Feature",
+        geometry: {
+          type: "LineString",
+          coordinates: ordered.map(p => [
+            p.lon,
+            p.lat
+          ])
+        },
+        properties: {
+          route_id,
+          shape_id: bestShape
+        }
+      });
+
+    }
+  );
 
   fs.writeFileSync(
     `${OUTPUT_PATH}/shapes.geojson`,
@@ -128,6 +186,7 @@ async function convertShapes() {
       features
     })
   );
+
 }
 
 async function convertTodayStopTimes() {
@@ -135,12 +194,10 @@ async function convertTodayStopTimes() {
   const stopTimes = await parseCSV("stop_times.txt");
   const trips = await parseCSV("trips.txt");
   const calendar = await parseCSV("calendar.txt");
-  const calendarDates = fs.existsSync(`${EXTRACT_PATH}/calendar_dates.txt`)
-    ? await parseCSV("calendar_dates.txt")
-    : [];
 
   const today = new Date();
-  const yyyymmdd = today.toISOString().slice(0,10).replace(/-/g,"");
+  const yyyymmdd =
+    today.toISOString().slice(0, 10).replace(/-/g, "");
   const weekday = today.getDay();
 
   const validServices = new Set();
@@ -166,25 +223,20 @@ async function convertTodayStopTimes() {
 
   });
 
-  calendarDates.forEach(row => {
-    if (row.date === yyyymmdd) {
-      if (row.exception_type === "1")
-        validServices.add(row.service_id);
-      if (row.exception_type === "2")
-        validServices.delete(row.service_id);
-    }
-  });
-
   const validTrips = new Set();
+
   trips.forEach(trip => {
+
     if (validServices.has(trip.service_id)) {
       validTrips.add(trip.trip_id);
     }
+
   });
 
   const result = {};
 
   stopTimes.forEach(st => {
+
     if (!validTrips.has(st.trip_id))
       return;
 
@@ -196,12 +248,56 @@ async function convertTodayStopTimes() {
       departure: st.departure_time,
       trip_id: st.trip_id
     });
+
   });
 
   fs.writeFileSync(
     `${OUTPUT_PATH}/today_stop_times.json`,
     JSON.stringify(result)
   );
+
+}
+
+async function convertStopRoutes() {
+
+  const stopTimes = await parseCSV("stop_times.txt");
+  const trips = await parseCSV("trips.txt");
+
+  const tripRouteMap = {};
+
+  trips.forEach(trip => {
+    tripRouteMap[trip.trip_id] = trip.route_id;
+  });
+
+  const stopRoutes = {};
+
+  stopTimes.forEach(st => {
+
+    const route_id = tripRouteMap[st.trip_id];
+
+    if (!route_id) return;
+
+    if (!stopRoutes[st.stop_id]) {
+      stopRoutes[st.stop_id] = new Set();
+    }
+
+    stopRoutes[st.stop_id].add(route_id);
+
+  });
+
+  const result = {};
+
+  Object.entries(stopRoutes).forEach(
+    ([stop_id, routes]) => {
+      result[stop_id] = Array.from(routes);
+    }
+  );
+
+  fs.writeFileSync(
+    `${OUTPUT_PATH}/stop_routes.json`,
+    JSON.stringify(result)
+  );
+
 }
 
 async function run() {
@@ -223,6 +319,7 @@ async function run() {
   await convertRoutes();
   await convertShapes();
   await convertTodayStopTimes();
+  await convertStopRoutes();
 
   console.log("✅ GTFS updated successfully");
 
