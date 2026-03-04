@@ -23,9 +23,7 @@ function ZoomTo({ geojson }: { geojson: FeatureCollection }) {
     const bounds = layer.getBounds();
 
     if (bounds.isValid()) {
-      map.fitBounds(bounds, {
-        padding: [80, 80]
-      });
+      map.fitBounds(bounds, { padding: [80, 80] });
     }
 
   }, [geojson, map]);
@@ -71,13 +69,21 @@ export default function RoutesMap({
 
   if (!shapes || !stops) return null;
 
+  // route_id appartenenti alla linea
+  const routeIds =
+    shapes.features
+      .filter(
+        (f: any) =>
+          f.properties?.route_short_name === selectedRoute
+      )
+      .map((f: any) => f.properties?.route_id);
+
   // percorso linea
   const filteredShapes: FeatureCollection = {
     type: "FeatureCollection",
     features: shapes.features.filter(
       (f: any) =>
-        selectedRoute &&
-        f.properties?.route_id === selectedRoute
+        routeIds.includes(f.properties?.route_id)
     )
   };
 
@@ -91,7 +97,11 @@ export default function RoutesMap({
       const routes =
         stopRoutes[f.properties?.stop_id];
 
-      return routes?.includes(selectedRoute);
+      if (!routes) return false;
+
+      return routes.some((r: string) =>
+        routeIds.includes(r)
+      );
 
     })
   };
@@ -119,11 +129,9 @@ export default function RoutesMap({
           <GeoJSON
             data={filteredShapes}
             style={(f: any) => ({
-
               color: `#${f.properties?.route_color || "0066cc"}`,
               weight: 6,
               opacity: 0.9
-
             })}
           />
         )}
@@ -135,13 +143,11 @@ export default function RoutesMap({
             data={filteredStops}
             pointToLayer={(feature: any, latlng) =>
               L.circleMarker(latlng, {
-
                 radius: 7,
                 fillColor: "#ffffff",
                 color: "#000",
                 weight: 2,
                 fillOpacity: 1
-
               })
             }
             onEachFeature={(feature: any, layer) => {
@@ -164,15 +170,11 @@ export default function RoutesMap({
                   <div style="
                     font-weight:700;
                     font-size:14px;
-                    margin-bottom:6px;
-                  ">
+                    margin-bottom:6px;">
                     ${feature.properties?.stop_name}
                   </div>
 
-                  <div style="
-                    font-size:12px;
-                    color:#444;
-                  ">
+                  <div style="font-size:12px;color:#444;">
                     ${html || "Nessun orario disponibile"}
                   </div>
 
