@@ -1,5 +1,4 @@
-import routes from "@/data/Cycleroutes.json"
-import Link from "next/link"
+import CicloturismoMap from "@/components/CicloturismoMap"
 
 export default function Page(){
 
@@ -7,17 +6,9 @@ export default function Page(){
 
   <div>
 
-   <h1>Cicloturismo</h1>
+   <h1>Cicloturismo Venezia</h1>
 
-   <ul>
-    {routes.map(route=>(
-     <li key={route.slug}>
-      <Link href={`/cicloturismo/${route.slug}`}>
-       {route.name} ({route.distance} km)
-      </Link>
-     </li>
-    ))}
-   </ul>
+   <CicloturismoMap />
 
   </div>
 
