@@ -38,9 +38,9 @@ export default function itinerari() {
             <h2 className="text-3xl md:text-4xl font-bold mb-10">
             Itinerari Ciclo turistici 
           </h2>
-          <p className="text-lg leading-relaxed text-gray-600 mb-6">
+          
              <CicloturismoList />
-          </p>
+          
 
           <p className="text-lg leading-relaxed text-gray-600 mb-6">
             
