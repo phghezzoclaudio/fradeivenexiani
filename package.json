@@ -1,14 +1,14 @@
-{
+  {
   "name": "fradeivenexiani",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "update-gtfs": "node scripts/update-gtfs.js",
     "dev": "npm run update-gtfs && next dev",
-    "build": "npm run update-gtfs && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint"
-  },
+  }
   "dependencies": {
     "@tmcw/togeojson": "^7.1.2",
     "@turf/turf": "^7.3.4",
