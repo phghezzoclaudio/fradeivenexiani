@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
-  }
+  },
   "dependencies": {
     "@tmcw/togeojson": "^7.1.2",
     "@turf/turf": "^7.3.4",
