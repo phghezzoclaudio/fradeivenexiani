@@ -11,6 +11,7 @@ export default function Itinerari() {
   return (
     <main className="bg-venice-ivory text-venice-graphite">
 
+      {/* HERO */}
       <section className="relative overflow-hidden bg-venice-red">
         <div className="max-w-5xl mx-auto px-6 py-24 text-center">
 
@@ -25,6 +26,7 @@ export default function Itinerari() {
         </div>
       </section>
 
+      {/* CONTENUTO */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
 
@@ -32,8 +34,10 @@ export default function Itinerari() {
             Itinerari Cicloturistici
           </h2>
 
+          {/* MAPPA */}
           <CicloturismoMapClient />
 
+          {/* LISTA */}
           <div className="mt-12">
             <CicloturismoList />
           </div>
