@@ -1,5 +1,6 @@
 
 import Link from "next/link";
+import CicloturismoList from "@/component/CicloturismoList";
 
 export default function itinerari() {
   return (
@@ -38,7 +39,7 @@ export default function itinerari() {
             Itinerari Ciclo turistici 
           </h2>
           <p className="text-lg leading-relaxed text-gray-600 mb-6">
-         
+             <CicloturismoList />
           </p>
 
           <p className="text-lg leading-relaxed text-gray-600 mb-6">
