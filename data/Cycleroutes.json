@@ -1,16 +1,16 @@
 [
  {
-  "slug":"laguna-nord",
-  "name":"Laguna Nord",
-  "distance":38,
-  "description":"un percorso che parte da Venezia e si snoda Lungo la costa nord della Laguna, in lontananza possiamo ammirare le isole di Murano, Burano e Torcello. il percorso è caratterizzato da strade pianeggianti e ciclabili, ed è adatto a ciclisti di tutti i Livelli di esperienza.",
-  "difficulty":"facile"
+  "slug": "laguna-nord",
+  "name": "Laguna Nord",
+  "distance": 38,
+  "description": "Un percorso che parte da Venezia e si snoda lungo la costa nord della laguna. In lontananza si possono ammirare le isole di Murano, Burano e Torcello.",
+  "difficulty": "facile"
  },
  {
-  "slug":"venezia-chioggia",
-  "name":"E05 Isole di Venezia  Venezia → Chioggia",
-  "distance":52,
-  "description":"",
-  "difficulty":"medio"
+  "slug": "venezia-chioggia",
+  "name": "E05 Isole di Venezia Venezia → Chioggia",
+  "distance": 52,
+  "description": "",
+  "difficulty": "medio"
  }
 ]

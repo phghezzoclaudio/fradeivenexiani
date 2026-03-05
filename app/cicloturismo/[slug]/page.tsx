@@ -1,24 +1,20 @@
 import MapClient from "@/components/MapClient"
 
-export default function Page({
+export default async function Page({
  params
 }:{
- params:{slug:string}
+ params: Promise<{ slug: string }>
 }){
 
- const {slug} = params
+ const { slug } = await params
 
- return(
+ return (
 
   <div>
 
    <h1>{slug}</h1>
 
    <MapClient slug={slug}/>
-
-   <a href={`/gpx/${slug}.gpx`} download>
-    Scarica GPX
-   </a>
 
   </div>
 
