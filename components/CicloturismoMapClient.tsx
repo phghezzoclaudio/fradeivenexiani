@@ -62,7 +62,7 @@ export default function CicloturismoMapClient(){
   Promise.all(
 
    files.map(name=>
-    fetch(`/Cycleroutes/${name}.geojson`)
+    fetch(`/public/Cycleroutes/${name}.geojson`)
      .then(r=>r.json())
    )
 
