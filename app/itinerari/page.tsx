@@ -1,3 +1,5 @@
+"use client"
+
 import dynamic from "next/dynamic"
 import CicloturismoList from "@/component/CicloturismoList"
 
@@ -34,10 +36,8 @@ export default function Itinerari() {
             Itinerari Cicloturistici
           </h2>
 
-          {/* MAPPA */}
           <CicloturismoMapClient />
 
-          {/* LISTA */}
           <div className="mt-12">
             <CicloturismoList />
           </div>
