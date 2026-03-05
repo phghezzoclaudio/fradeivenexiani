@@ -8,7 +8,6 @@ import {
  useMap
 } from "react-leaflet"
 
-import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 
 import type { FeatureCollection } from "geojson"
@@ -27,14 +26,18 @@ function FitBounds({
 
   if(!geojson?.features?.length) return
 
-  const layer = L.geoJSON(geojson)
-  const bounds = layer.getBounds()
+  import("leaflet").then((L)=>{
 
-  if(bounds.isValid()){
-   map.fitBounds(bounds,{
-    padding:[60,60]
-   })
-  }
+   const layer = L.geoJSON(geojson)
+   const bounds = layer.getBounds()
+
+   if(bounds.isValid()){
+    map.fitBounds(bounds,{
+     padding:[60,60]
+    })
+   }
+
+  })
 
  },[geojson,map])
 
@@ -43,6 +46,8 @@ function FitBounds({
 
 
 export default function CicloturismoMapClient(){
+
+ if (typeof window === "undefined") return null
 
  const [cycleRoutes,setCycleRoutes] =
   useState<FeatureCollection[]>([])
