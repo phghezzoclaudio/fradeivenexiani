@@ -1,26 +1,33 @@
-const fs = require("fs-extra")
-const {DOMParser} = require("xmldom")
-const togeojson = require("@tmcw/togeojson")
+const fs = require("fs-extra");
+const { DOMParser } = require("xmldom");
+const togeojson = require("@tmcw/togeojson");
+const path = require("path");
 
-const input="./data/gpx"
-const output="./public/Cycleroutes"
+const input = "./data/gpx";
+const output = "./public/Cycleroutes";
 
-fs.ensureDirSync(output)
+fs.ensureDirSync(output);
 
-const files=fs.readdirSync(input)
+const files = fs.readdirSync(input);
 
-files.forEach(file=>{
+files.forEach(file => {
 
- if(!file.endsWith(".gpx")) return
+  if (!file.endsWith(".gpx")) return;
 
- const gpx=fs.readFileSync(`${input}/${file}`,"utf8")
+  const gpx = fs.readFileSync(path.join(input, file), "utf8");
 
- const dom=new DOMParser().parseFromString(gpx)
+  const dom = new DOMParser().parseFromString(gpx, "text/xml");
 
- const geojson=togeojson.gpx(dom)
+  const geojson = togeojson.gpx(dom);
 
- const name=file.replace(".gpx",".geojson")
+  const name = file.replace(".gpx", ".geojson");
 
- fs.writeJsonSync(`${output}/${name}`,geojson)
+  fs.writeJsonSync(
+    path.join(output, name),
+    geojson,
+    { spaces: 2 }
+  );
 
-})
+  console.log(`✅ Creato ${name}`);
+
+});
