@@ -4,33 +4,50 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet"
 import { useEffect, useState } from "react"
 import routes from "@/data/Cycleroutes.json"
 import { useRouter } from "next/navigation"
+import { FeatureCollection } from "geojson"
+
+type GeoRoute = {
+ slug: string
+ geojson: FeatureCollection
+}
 
 export default function CicloturismoMap(){
 
- const [geoRoutes,setGeoRoutes] = useState<any[]>([])
+ const [geoRoutes,setGeoRoutes] = useState<GeoRoute[]>([])
  const router = useRouter()
 
  useEffect(()=>{
 
   async function loadRoutes(){
 
-   const loaded = await Promise.all(
+   try{
 
-    routes.map(async (route)=>{
+    const loaded = await Promise.all(
 
-     const res = await fetch(`/Cycleroutes/${route.slug}.geojson`)
-     const data = await res.json()
+     routes.map(async (route)=>{
 
-     return {
-      slug: route.slug,
-      geojson: data
-     }
+      const res = await fetch(`/Cycleroutes/${route.slug}.geojson`)
 
-    })
+      if(!res.ok){
+       throw new Error(`Errore caricamento ${route.slug}`)
+      }
 
-   )
+      const data = await res.json()
 
-   setGeoRoutes(loaded)
+      return {
+       slug: route.slug,
+       geojson: data
+      }
+
+     })
+
+    )
+
+    setGeoRoutes(loaded)
+
+   }catch(err){
+    console.error("Errore caricamento percorsi",err)
+   }
 
   }
 
@@ -43,7 +60,7 @@ export default function CicloturismoMap(){
   <MapContainer
    center={[45.44,12.33]}
    zoom={10}
-   style={{height:"600px"}}
+   style={{height:"70vh", width:"100%"}}
   >
 
    <TileLayer
@@ -55,12 +72,17 @@ export default function CicloturismoMap(){
     <GeoJSON
      key={route.slug}
      data={route.geojson}
-     eventHandlers={{
-      click: () => router.push(`/cicloturismo/${route.slug}`)
-     }}
      style={{
       color:"#e11d48",
       weight:4
+     }}
+     eventHandlers={{
+      click: () => router.push(`/cicloturismo/${route.slug}`)
+     }}
+     onEachFeature={(feature,layer)=>{
+      if(feature.properties?.name){
+       layer.bindPopup(feature.properties.name)
+      }
      }}
     />
 

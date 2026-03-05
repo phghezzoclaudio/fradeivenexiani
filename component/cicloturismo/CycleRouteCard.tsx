@@ -1,38 +1,41 @@
 import Link from "next/link"
 
-type Props = {
- slug: string
- name: string
- description: string 
- distance: number
- difficulty?: string
+type Props={
+ slug:string
+ name:string
+ distance:number
+ difficulty?:string
+ description?:string
 }
 
 export default function CycleRouteCard({
  slug,
  name,
  distance,
- difficulty
-}: Props){
+ difficulty,
+ description
+}:Props){
 
  return(
 
   <Link
    href={`/cicloturismo/${slug}`}
-   className="block bg-white rounded-xl shadow hover:shadow-lg transition p-6"
+   className="block bg-white rounded-xl shadow hover:shadow-lg p-6"
   >
 
-   <h3 className="text-xl font-bold mb-2 text-venice-red">
+   <h3 className="text-xl font-bold mb-2">
     {name}
    </h3>
 
-   <div className="flex gap-4 text-sm text-gray-600">
+   <p className="text-sm text-gray-600 mb-2">
+    🚴 {distance} km {difficulty && `• ${difficulty}`}
+   </p>
 
-    <span>🚴 {distance} km</span>
-
-    {difficulty && <span>⛰ {difficulty}</span>}
-
-   </div>
+   {description && (
+    <p className="text-sm text-gray-500">
+     {description}
+    </p>
+   )}
 
   </Link>
 

@@ -7,15 +7,15 @@ export default function CicloturismoList(){
 
   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-   {routes.map((route) => (
+   {routes.map(route =>(
 
     <CycleRouteCard
-      key={route.slug}
-      slug={route.slug}
-      name={route.name}
-      distance={route.distance}
-      difficulty={route.difficulty}
-      description={route.description}
+     key={route.slug}
+     slug={route.slug}
+     name={route.name}
+     distance={route.distance}
+     difficulty={route.difficulty}
+     description={route.description}
     />
 
    ))}

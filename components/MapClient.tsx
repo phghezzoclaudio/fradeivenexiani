@@ -3,14 +3,16 @@
 import dynamic from "next/dynamic"
 
 const CycleMap = dynamic(
-  () => import("./CycleMap"),
-  { ssr: false }
+ () => import("./CycleMap"),
+ { ssr:false }
 )
 
 type Props = {
-  slug: string
+ slug:string
 }
 
-export default function MapClient({ slug }: Props) {
-  return <CycleMap slug={slug} />
+export default function MapClient({slug}:Props){
+
+ return <CycleMap slug={slug}/>
+
 }
