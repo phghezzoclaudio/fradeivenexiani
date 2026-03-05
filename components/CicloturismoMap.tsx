@@ -1,27 +1,12 @@
 "use client"
 
-import dynamic from "next/dynamic"
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet"
 import { useEffect, useState } from "react"
 import routes from "@/data/Cycleroutes.json"
 import { useRouter } from "next/navigation"
 import { FeatureCollection } from "geojson"
 
-const MapContainer = dynamic(
- () => import("react-leaflet").then(m => m.MapContainer),
- { ssr:false }
-)
-
-const TileLayer = dynamic(
- () => import("react-leaflet").then(m => m.TileLayer),
- { ssr:false }
-)
-
-const GeoJSON = dynamic(
- () => import("react-leaflet").then(m => m.GeoJSON),
- { ssr:false }
-)
-
-type GeoRoute = {
+type GeoRoute={
  slug:string
  geojson:FeatureCollection
 }
