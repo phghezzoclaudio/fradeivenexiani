@@ -17,7 +17,7 @@ export default function CycleMap({ slug }: Props){
 
  useEffect(()=>{
 
-  fetch(`/routes/${slug}.geojson`)
+  fetch(`/Cycleroutes/${slug}.geojson`)
    .then(r=>r.json())
    .then(setRoute)
 
