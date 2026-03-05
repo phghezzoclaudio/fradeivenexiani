@@ -3,7 +3,7 @@ const {DOMParser} = require("xmldom")
 const togeojson = require("@tmcw/togeojson")
 
 const input="./data/gpx"
-const output="./public/routes"
+const output="./public/Cycleroutes"
 
 fs.ensureDirSync(output)
 
