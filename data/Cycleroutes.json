@@ -6,6 +6,13 @@
   "description": "",
   "difficulty": "facile"
  },
+{
+  "slug": "Mestre-forti-boschi-e-Laguna",
+  "name": "Mestre: fortificata il suoi boschi e la laguna",
+  "distance": 32.2,
+  "description": "La Mestre che non ti aspetti, tra forti e torri, boschi e laguna.",
+  "difficulty": "facile"
+ },
  {
   "slug": "laguna-nord",
   "name": "Laguna Nord",
