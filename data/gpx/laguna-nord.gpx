@@ -15,19 +15,19 @@
   </wpt>
   <wpt lat="45.491646" lon="12.576216">
     <name>Pista ciclabile del Canale Casson</name>
-    <sym>Flag, Blue</sym>
+    <sym>Bicycle</sym>
   </wpt>
   <wpt lat="45.485392" lon="12.558303">
     <name>Canale Casson</name>
-    <sym>Flag, Blue</sym>
+    <sym>Bicycle</sym>
   </wpt>
   <wpt lat="45.483034" lon="12.545579">
     <name>Pista ciclabile di Via della Marinona lungo la Laguna Nord di Venezia</name>
-    <sym>Flag, Blue</sym>
+   <sym>Bicycle</sym>
   </wpt>
   <wpt lat="45.478115" lon="12.525042">
     <name>Canale Pordello</name>
-    <sym>Flag, Blue</sym>
+    <sym>Bicycle</sym>
   </wpt>
   <wpt lat="45.458721" lon="12.462337">
     <name>Pista ciclabile e pedonale sospesa Via Pordelio</name>
@@ -35,15 +35,15 @@
   </wpt>
   <wpt lat="45.473115" lon="12.475441">
     <name>Aironi e ibis nella laguna di Jesolo</name>
-    <sym>Flag, Blue</sym>
+    <sym>Bicycle</sym>
   </wpt>
   <wpt lat="45.473764" lon="12.475438">
     <name>Via Lio Piccolo</name>
-    <sym>Flag, Blue</sym>
+   <sym>Bicycle</sym>
   </wpt>
   <wpt lat="45.490088" lon="12.489948">
     <name>Chiesa di Santa Maria della Neve e Campanile, Lio Piccolo</name>
-    <sym>Flag, Blue</sym>
+    <sym>Bicycle</sym>
   </wpt>
   <wpt lat="45.472902" lon="12.475317">
     <name>Ciclabile della Laguna di Lio Piccolo</name>
