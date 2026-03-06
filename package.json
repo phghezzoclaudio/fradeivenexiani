@@ -1,4 +1,4 @@
-  {
+{
   "name": "fradeivenexiani",
   "version": "0.1.0",
   "private": true,
@@ -25,6 +25,7 @@
     "papaparse": "^5.5.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-icons": "^5.6.0",
     "react-leaflet": "^5.0.0",
     "unzipper": "^0.12.3",
     "xmldom": "^0.6.0"
