@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
-import type { FeatureCollection } from "geojson"
+import type { Feature, FeatureCollection } from "geojson"
 
 function FitBounds({ geojson }: { geojson: FeatureCollection }) {
 
@@ -50,11 +50,11 @@ export default function CicloturismoMap() {
 
       // 🔹 rimuove tutti i Point dal GeoJSON (elimina i marker)
       const cleaned = routes.map(route => ({
-        ...route,
-        features: route.features.filter(
-          f => f.geometry.type !== "Point"
-        )
-      }))
+  ...route,
+  features: route.features.filter(
+    (f: Feature) => f.geometry?.type !== "Point"
+  )
+}))
 
       setCycleRoutes(cleaned)
 
