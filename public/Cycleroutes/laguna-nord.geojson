@@ -5,7 +5,6 @@
       "type": "Feature",
       "properties": {
         "_gpxType": "trk",
-        "segment": "bike",
         "name": "GPX Download: Pista ciclabile del Canale Casson – Ciclabile della Laguna di Lio Piccolo giro ad anello con partenza da Ca' Savio - Spiaggia",
         "time": "2026-03-05T16:02:00.182Z",
         "coordinateProperties": {
@@ -4909,7 +4908,7 @@
       "type": "Feature",
       "properties": {
         "name": "Pista ciclabile del Canale Casson",
-        "sym": "Flag, Blue"
+        "sym": "Bicycle"
       },
       "geometry": {
         "type": "Point",
@@ -4923,7 +4922,7 @@
       "type": "Feature",
       "properties": {
         "name": "Canale Casson",
-        "sym": "Flag, Blue"
+        "sym": "Bicycle"
       },
       "geometry": {
         "type": "Point",
@@ -4937,7 +4936,7 @@
       "type": "Feature",
       "properties": {
         "name": "Pista ciclabile di Via della Marinona lungo la Laguna Nord di Venezia",
-        "sym": "Flag, Blue"
+        "sym": "Bicycle"
       },
       "geometry": {
         "type": "Point",
@@ -4951,7 +4950,7 @@
       "type": "Feature",
       "properties": {
         "name": "Canale Pordello",
-        "sym": "Flag, Blue"
+        "sym": "Bicycle"
       },
       "geometry": {
         "type": "Point",
@@ -4979,7 +4978,7 @@
       "type": "Feature",
       "properties": {
         "name": "Aironi e ibis nella laguna di Jesolo",
-        "sym": "Flag, Blue"
+        "sym": "Bicycle"
       },
       "geometry": {
         "type": "Point",
@@ -4993,7 +4992,7 @@
       "type": "Feature",
       "properties": {
         "name": "Via Lio Piccolo",
-        "sym": "Flag, Blue"
+        "sym": "Bicycle"
       },
       "geometry": {
         "type": "Point",
@@ -5007,7 +5006,7 @@
       "type": "Feature",
       "properties": {
         "name": "Chiesa di Santa Maria della Neve e Campanile, Lio Piccolo",
-        "sym": "Flag, Blue"
+        "sym": "Bicycle"
       },
       "geometry": {
         "type": "Point",
