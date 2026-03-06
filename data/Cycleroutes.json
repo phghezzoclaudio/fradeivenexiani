@@ -1,4 +1,11 @@
 [
+{
+  "slug": "Mestre-Venezia",
+  "name": "Mestre Venezia",
+  "distance": 10,
+  "description": "",
+  "difficulty": "facile"
+ },
  {
   "slug": "laguna-nord",
   "name": "Laguna Nord",
