@@ -5,6 +5,7 @@
       "type": "Feature",
       "properties": {
         "_gpxType": "trk",
+        "segment": "bike",
         "name": "GPX Download: Pista ciclabile del Canale Casson – Ciclabile della Laguna di Lio Piccolo giro ad anello con partenza da Ca' Savio - Spiaggia",
         "time": "2026-03-05T16:02:00.182Z",
         "coordinateProperties": {
