@@ -86,14 +86,14 @@ export default function CicloturismoMap() {
 
             if (segment === "walk") {
               return {
-                color: "#f4a261",
+                color: "#61f481",
                 weight: 5,
                 dashArray: "6,6"
               }
             }
 
             return {
-              color: "#e63946",
+              color: "#f07326",
               weight: 5
             }
 
