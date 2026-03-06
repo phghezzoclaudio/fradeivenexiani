@@ -3911,8 +3911,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Tronchetto ferry",
-        "sym": "Flag, Blue"
+        "name": "Tronchetto ferry"
       },
       "geometry": {
         "type": "Point",
