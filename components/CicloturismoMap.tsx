@@ -3,34 +3,28 @@
 import { useEffect, useState } from "react"
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
-import type { Feature, FeatureCollection } from "geojson"
+import type { FeatureCollection } from "geojson"
 
 function FitBounds({ geojson }: { geojson: FeatureCollection }) {
-
   const map = useMap()
 
   useEffect(() => {
-
     if (!geojson?.features?.length) return
 
     import("leaflet").then((L) => {
-
       const layer = L.geoJSON(geojson)
       const bounds = layer.getBounds()
 
       if (bounds.isValid()) {
         map.fitBounds(bounds, { padding: [60, 60] })
       }
-
     })
-
   }, [geojson, map])
 
   return null
 }
 
 export default function CicloturismoMap() {
-
   const [cycleRoutes, setCycleRoutes] =
     useState<FeatureCollection[]>([])
 
@@ -47,17 +41,7 @@ export default function CicloturismoMap() {
           .then(r => r.json())
       )
     ).then((routes) => {
-
-      // 🔹 rimuove tutti i Point dal GeoJSON (elimina i marker)
-      const cleaned = routes.map(route => ({
-  ...route,
-  features: route.features.filter(
-    (f: Feature) => f.geometry?.type !== "Point"
-  )
-}))
-
-      setCycleRoutes(cleaned)
-
+      setCycleRoutes(routes)
     })
 
   }, [])
@@ -80,6 +64,20 @@ export default function CicloturismoMap() {
         <GeoJSON
           key={i}
           data={route}
+
+          pointToLayer={(feature, latlng) => {
+
+            const L = require("leaflet")
+
+            return L.marker(latlng, {
+              icon: L.divIcon({
+                html: "📍",
+                className: "",
+                iconSize: [20, 20]
+              })
+            })
+
+          }}
 
           style={(feature) => {
 
@@ -122,6 +120,5 @@ export default function CicloturismoMap() {
       )}
 
     </MapContainer>
-
   )
 }
