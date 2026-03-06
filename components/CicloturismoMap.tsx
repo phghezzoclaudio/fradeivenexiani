@@ -32,6 +32,7 @@ export default function CicloturismoMap() {
 
     const files = [
       "laguna-nord",
+      "Venezia-Mestre",
       "E05-Isole-di-Venezia-venezia-chioggia"
     ]
 
