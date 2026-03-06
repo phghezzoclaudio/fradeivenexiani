@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+	<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="Wikipedia"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <trk>
+    <name>Venezia - Mestre by PisteCiclabili.com</name>
+    <trkseg>
+      <trkpt lat="45.438002022009" lon="12.304472923279"></trkpt>
+      <trkpt lat="45.442533826376" lon="12.308077812195"></trkpt>
+      <trkpt lat="45.440697059171" lon="12.313034534454"></trkpt>
+      <trkpt lat="45.441419728813" lon="12.31522321701"></trkpt>
+      <trkpt lat="45.443391967607" lon="12.315008640289"></trkpt>
+      <trkpt lat="45.444295260065" lon="12.314515113831"></trkpt>
+      <trkpt lat="45.444641518339" lon="12.314182519913"></trkpt>
+      <trkpt lat="45.445714152764" lon="12.312353253365"></trkpt>
+      <trkpt lat="45.44771258566" lon="12.309107780457"></trkpt>
+      <trkpt lat="45.456051797489" lon="12.294409275055"></trkpt>
+      <trkpt lat="45.464886403972" lon="12.278509140015"></trkpt>
+      <trkpt lat="45.465473321971" lon="12.275784015656"></trkpt>
+      <trkpt lat="45.467429671169" lon="12.271857261658"></trkpt>
+      <trkpt lat="45.467670447917" lon="12.271385192871"></trkpt>
+      <trkpt lat="45.467369476822" lon="12.270934581757"></trkpt>
+      <trkpt lat="45.46693306588" lon="12.270526885986"></trkpt>
+      <trkpt lat="45.466285967574" lon="12.266771793365"></trkpt>
+      <trkpt lat="45.466342400862" lon="12.26659476757"></trkpt>
+      <trkpt lat="45.466504175973" lon="12.26621389389"></trkpt>
+      <trkpt lat="45.466827724801" lon="12.26610660553"></trkpt>
+      <trkpt lat="45.46821595393" lon="12.2658598423"></trkpt>
+      <trkpt lat="45.468742644382" lon="12.265559434891"></trkpt>
+      <trkpt lat="45.469141421022" lon="12.264937162399"></trkpt>
+      <trkpt lat="45.469581576868" lon="12.263445854187"></trkpt>
+      <trkpt lat="45.470108254559" lon="12.261525392532"></trkpt>
+      <trkpt lat="45.470397925191" lon="12.26038813591"></trkpt>
+      <trkpt lat="45.470390401298" lon="12.260028719902"></trkpt>
+      <trkpt lat="45.470777880517" lon="12.258934378624"></trkpt>
+      <trkpt lat="45.471044976292" lon="12.258081436157"></trkpt>
+      <trkpt lat="45.471048738196" lon="12.257979512215"></trkpt>
+      <trkpt lat="45.47078916628" lon="12.257727384567"></trkpt>
+      <trkpt lat="45.470845595059" lon="12.257620096207"></trkpt>
+      <trkpt lat="45.470947166719" lon="12.257705926895"></trkpt>
+      <trkpt lat="45.471556592834" lon="12.256375551224"></trkpt>
+      <trkpt lat="45.471729638555" lon="12.256531119347"></trkpt>
+      <trkpt lat="45.472207392459" lon="12.255490422249"></trkpt>
+      <trkpt lat="45.47222996341" lon="12.255517244339"></trkpt>
+      <trkpt lat="45.47216601236" lon="12.255667448044"></trkpt>
+      <trkpt lat="45.472655047954" lon="12.256214618683"></trkpt>
+      <trkpt lat="45.472914611277" lon="12.25575864315"></trkpt>
+      <trkpt lat="45.473046273375" lon="12.255833745003"></trkpt>
+      <trkpt lat="45.473986707986" lon="12.254143953323"></trkpt>
+      <trkpt lat="45.475724589849" lon="12.251998186111"></trkpt>
+      <trkpt lat="45.475931476977" lon="12.251746058464"></trkpt>
+      <trkpt lat="45.476326441203" lon="12.251585125923"></trkpt>
+      <trkpt lat="45.476721402661" lon="12.251461744308"></trkpt>
+      <trkpt lat="45.477311958915" lon="12.249830961227"></trkpt>
+      <trkpt lat="45.478007829361" lon="12.248232364655"></trkpt>
+      <trkpt lat="45.478921851537" lon="12.2459846735"></trkpt>
+      <trkpt lat="45.479290465338" lon="12.245008349419"></trkpt>
+      <trkpt lat="45.480035208314" lon="12.24448800087"></trkpt>
+      <trkpt lat="45.480136763412" lon="12.244235873222"></trkpt>
+      <trkpt lat="45.480806270215" lon="12.241392731667"></trkpt>
+      <trkpt lat="45.481720246996" lon="12.237331867218"></trkpt>
+      <trkpt lat="45.482032424968" lon="12.237492799759"></trkpt>
+      <trkpt lat="45.48198729091" lon="12.238023877144"></trkpt>
+      <trkpt lat="45.482164065763" lon="12.238093614578"></trkpt>
+      <trkpt lat="45.482265617024" lon="12.237970232964"></trkpt>
+      <trkpt lat="45.482340840062" lon="12.23768055439"></trkpt>
+      <trkpt lat="45.483499262162" lon="12.238351106644"></trkpt>
+      <trkpt lat="45.483439084977" lon="12.238619327545"></trkpt>
+    </trkseg>
+  </trk>
+</gpx>
