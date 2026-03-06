@@ -46,7 +46,19 @@ export default function CicloturismoMap() {
         fetch(`/Cycleroutes/${name}.geojson`)
           .then(r => r.json())
       )
-    ).then(setCycleRoutes)
+    ).then((routes) => {
+
+      // 🔹 rimuove tutti i Point dal GeoJSON (elimina i marker)
+      const cleaned = routes.map(route => ({
+        ...route,
+        features: route.features.filter(
+          f => f.geometry.type !== "Point"
+        )
+      }))
+
+      setCycleRoutes(cleaned)
+
+    })
 
   }, [])
 
@@ -68,10 +80,39 @@ export default function CicloturismoMap() {
         <GeoJSON
           key={i}
           data={route}
-          style={{
-            color: "#e63946",
-            weight: 5
+
+          style={(feature) => {
+
+            const segment = feature?.properties?.segment
+
+            if (segment === "walk") {
+              return {
+                color: "#f4a261",
+                weight: 5,
+                dashArray: "6,6"
+              }
+            }
+
+            return {
+              color: "#e63946",
+              weight: 5
+            }
+
           }}
+
+          onEachFeature={(feature, layer) => {
+
+            const segment = feature?.properties?.segment
+
+            const label =
+              segment === "walk"
+                ? "🚶 Tratto bici a mano"
+                : "🚴 Tratto ciclabile"
+
+            layer.bindPopup(label)
+
+          }}
+
         />
 
       ))}
