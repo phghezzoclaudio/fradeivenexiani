@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-   "convert-gpx": "node scripts/convert-gpx.js",
+    "convert-gpx": "node scripts/convert-gpx.js",
     "update-gtfs": "node scripts/update-gtfs.js",
     "dev": "npm run update-gtfs && next dev",
     "build": "next build",
