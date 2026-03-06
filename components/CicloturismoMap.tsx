@@ -34,7 +34,7 @@ export default function CicloturismoMap() {
       "laguna-nord",
       "Venezia-Mestre",
       "E05-Isole-di-Venezia-venezia-chioggia",
-      "Mestre-forti-boschi-e-Laguna"
+      "Mestre-forti-boschi-e-laguna"
     ]
 
     Promise.all(
