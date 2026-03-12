@@ -51,10 +51,10 @@ const events = [
   }
 ]
 
-export default function Home() {
+export default function Eventi() {
   return (
-    <main className="min-h-screen bg-blue-900 text-white p-10">
-      
+    <main className="min-h-screen bg-blue-900 text-white p-10 max-w-6xl mx-auto">
+
       <h1 className="text-5xl font-bold mb-10">
         Venezia Eventi 2026
       </h1>
