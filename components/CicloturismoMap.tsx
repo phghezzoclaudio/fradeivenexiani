@@ -115,6 +115,7 @@ export default function CicloturismoMap() {
 
             const name = feature?.properties?.name
             const segment = feature?.properties?.segment
+            const sym= feature?.properties?.sym
 
             let icon = "🚴"
             let text = "Tratto ciclabile"
@@ -127,6 +128,7 @@ export default function CicloturismoMap() {
             layer.bindPopup(`
               <strong>${name || "Percorso ciclabile"}</strong><br/>
               ${icon} ${text}
+              ${sym ?"🚩"+sym:""}
             `)
 
           }}
