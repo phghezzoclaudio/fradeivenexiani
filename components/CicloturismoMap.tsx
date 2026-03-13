@@ -76,11 +76,15 @@ export default function CicloturismoMap() {
           pointToLayer={(feature, latlng) => {
 
             const type = feature?.properties?.type
+            const sym= feature?.properties?.sym
 
             let icon = "📍"
 
             if (type === "start") icon = "🚴"
             if (type === "end") icon = "🏁"
+            
+             if (sym === "Flag, Blue") icon = "🚩"
+             if (sym === "Flag, Red") icon = "🏁"
 
             return L.marker(latlng, {
               icon: L.divIcon({
