@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
+import L from "leaflet"
 import type { FeatureCollection } from "geojson"
 
 function FitBounds({ geojson }: { geojson: FeatureCollection }) {
@@ -11,22 +12,20 @@ function FitBounds({ geojson }: { geojson: FeatureCollection }) {
   useEffect(() => {
     if (!geojson?.features?.length) return
 
-    import("leaflet").then((L) => {
-      const layer = L.geoJSON(geojson)
-      const bounds = layer.getBounds()
+    const layer = L.geoJSON(geojson)
+    const bounds = layer.getBounds()
 
-      if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [60, 60] })
-      }
-    })
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [60, 60] })
+    }
   }, [geojson, map])
 
   return null
 }
 
 export default function CicloturismoMap() {
-  const [cycleRoutes, setCycleRoutes] =
-    useState<FeatureCollection[]>([])
+
+  const [cycleRoutes, setCycleRoutes] = useState<FeatureCollection[]>([])
 
   useEffect(() => {
 
@@ -41,12 +40,19 @@ export default function CicloturismoMap() {
       files.map(name =>
         fetch(`/Cycleroutes/${name}.geojson`)
           .then(r => r.json())
+          .catch(() => null)
       )
     ).then((routes) => {
-      setCycleRoutes(routes)
+      const validRoutes = routes.filter(Boolean) as FeatureCollection[]
+      setCycleRoutes(validRoutes)
     })
 
   }, [])
+
+  const allFeatures = useMemo<FeatureCollection>(() => ({
+    type: "FeatureCollection",
+    features: cycleRoutes.flatMap(route => route.features)
+  }), [cycleRoutes])
 
   return (
 
@@ -69,11 +75,16 @@ export default function CicloturismoMap() {
 
           pointToLayer={(feature, latlng) => {
 
-            const L = require("leaflet")
+            const type = feature?.properties?.type
+
+            let icon = "📍"
+
+            if (type === "start") icon = "🚴"
+            if (type === "end") icon = "🏁"
 
             return L.marker(latlng, {
               icon: L.divIcon({
-                html: "📍",
+                html: icon,
                 className: "",
                 iconSize: [20, 20]
               })
@@ -102,14 +113,21 @@ export default function CicloturismoMap() {
 
           onEachFeature={(feature, layer) => {
 
+            const name = feature?.properties?.name
             const segment = feature?.properties?.segment
 
-            const label =
-              segment === "walk"
-                ? "🚶 Tratto bici a mano"
-                : "🚴 Tratto ciclabile"
+            let icon = "🚴"
+            let text = "Tratto ciclabile"
 
-            layer.bindPopup(label)
+            if (segment === "walk") {
+              icon = "🚶"
+              text = "Tratto bici a mano"
+            }
+
+            layer.bindPopup(`
+              <strong>${name || "Percorso ciclabile"}</strong><br/>
+              ${icon} ${text}
+            `)
 
           }}
 
@@ -118,7 +136,7 @@ export default function CicloturismoMap() {
       ))}
 
       {cycleRoutes.length > 0 && (
-        <FitBounds geojson={cycleRoutes[0]} />
+        <FitBounds geojson={allFeatures} />
       )}
 
     </MapContainer>
