@@ -1,0 +1,35 @@
+{
+  "slug": "la-citta-dacqua",
+  "title": "La Città d’acqua",
+  "excerpt": "Mestre è una città d’acqua con fiumi, laguna e collegamenti al mare Adriatico.",
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "Mestre è a tutti gli effetti una città d’acqua, con un porto industriale e commerciale. Ma il rapporto con l’acqua si esplica prevalentemente attraverso la presenza di piccoli e grandi fiumi, canali industriali e salmastri, la laguna su cui si affaccia e il mare Adriatico a cui è collegata con tre bocche di porto."
+    },
+    {
+      "type": "paragraph",
+      "text": "La città si estende lungo la gronda lagunare per oltre 10 km con accessi diretti a sud nei pressi di Fusina, nel porto industriale di Marghera e, più a nord, a San Giuliano e Tessera. Attraverso la laguna si ha accesso, per le tre bocche di porto (San Nicolò, Alberoni, Chioggia), al mare e ai 117 km di litorale di spiaggia sabbiosa affacciato sull’Adriatico."
+    },
+    {
+      "type": "paragraph",
+      "text": "Il porto industriale e commerciale, uno dei più estesi del Mediterraneo, è percorso da oltre 20 km di canali, il primo dei quali è stato scavato all’inizio del 1900."
+    },
+    {
+      "type": "paragraph",
+      "text": "A pochi chilometri dalla città, scorrono grandi fiumi come il Sile, il Piave, l’Adige e il Brenta, il cui corso fu deviato ai tempi della Serenissima e che incidono sugli habitat lagunari e dell’area metropolitana. Più urbani, invece, sono i minori Osellino, Marzenego, Dese e Zero."
+    }
+  ],
+  "category": "territorio",
+  "tags": [
+    "mestre",
+    "laguna",
+    "fiumi",
+    "mare",
+    "geografia"
+  ],
+  "seo": {
+    "title": "La Città d’acqua - Mestre",
+    "description": "Scopri Mestre città d’acqua tra laguna, fiumi e mare Adriatico."
+  }
+}
