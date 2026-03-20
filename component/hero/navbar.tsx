@@ -18,6 +18,7 @@ export default function Navbar() {
     { href: "/arrivare-a-venezia", label: "Arrivare" },
     { href: "/maree", label: "Acqua Alta" },
     { href: "/chi-siamo", label: "Chi siamo" },
+    {href:"/mestre",label:"La terraferma"}
   ];
 
   /* ===== SCROLL LOGIC ===== */
