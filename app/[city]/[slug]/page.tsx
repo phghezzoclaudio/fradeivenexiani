@@ -19,18 +19,40 @@ export default async function PageComponent({
   }
 
   return (
-    <main className="max-w-3xl mx-auto p-8">
-      <h1 className="text-4xl font-bold">{page.title}</h1>
+    <main className="min-h-screen bg-venice-ivory">
 
-      {page.excerpt && (
-        <p className="text-gray-600 mt-2">{page.excerpt}</p>
-      )}
+    <div className="min-h-screen bg-venice-ivory">
 
-      <div className="mt-6">
-        {page.content.map((block, i) => (
-          <RenderBlock key={i} block={block} />
-        ))}
-      </div>
+      {/* ===== HERO HEADER ===== */}
+
+      <section className="bg-venice-red text-white">
+        <div className="max-w-6xl mx-auto px-6 py-16 text-center">
+          <h1 className="text-4xl font-bold">
+            {page.title}
+          </h1>
+        </div>
+      </section>
+
+      {/* ===== CONTENT ===== */}
+
+      <section className="max-w-6xl mx-auto px-6 py-12">
+
+        {page.excerpt && (
+          <p className="text-gray-600 text-lg">
+            {page.excerpt}
+          </p>
+        )}
+
+        <div className="mt-8 space-y-6">
+          {page.content.map((block, i) => (
+            <RenderBlock key={i} block={block} />
+          ))}
+        </div>
+
+      </section>
+
+    </div>
     </main>
+    
   )
 }
