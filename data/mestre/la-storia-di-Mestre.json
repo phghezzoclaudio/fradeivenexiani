@@ -1,0 +1,31 @@
+{
+  "slug": "la-storia-di-mestre",
+  "title": "La Storia di Mestre",
+  "excerpt": "Dalle origini leggendarie legate alla guerra di Troia fino alle ipotesi archeologiche sull’epoca romana.",
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "Secondo una leggenda, le origini di Mestre sarebbero strettamente legate a quelle dei Veneti e risalirebbero dunque ad Antenore, fondatore di Padova dopo la fuga da Troia."
+    },
+    {
+      "type": "paragraph",
+      "text": "Al suo seguito ci sarebbe stato un valoroso guerriero chiamato Mesthle, figlio di Pilemene, re di Paflagonia, che si stabilì in una località boscosa fronteggiante la laguna, la mitica Selva Fetontea, dove fondò una città che, dal proprio nome, chiamò Mestre."
+    },
+    {
+      "type": "paragraph",
+      "text": "Il toponimo è quindi di derivazione oscura, ma di probabile origine paleoveneta."
+    },
+    {
+      "type": "paragraph",
+      "text": "La colonizzazione paleoveneta prima e romana poi non sembrano aver prodotto in questa zona rurale insediamenti urbani, anche se è stata elaborata un’ipotesi secondo la quale sarebbe esistito un oppidum, cioè una località fortificata romana."
+    },
+    {
+      "type": "paragraph",
+      "text": "Secondo questa ipotesi, l’oppidum sarebbe stato distrutto da Attila e sulle sue rovine sarebbe poi sorto il primo castello medievale."
+    }
+  ],
+  "seo": {
+    "title": "Origini di Mestre - Tra leggenda e storia",
+    "description": "Scopri le origini leggendarie e storiche di Mestre, tra miti troiani e ipotesi archeologiche."
+  }
+}

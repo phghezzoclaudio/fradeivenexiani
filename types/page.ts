@@ -1,18 +1,37 @@
-export type TextSection = {
-  type: "text"
-  title: string
-  content: string
+export type ParagraphBlock = {
+  type: "paragraph"
+  text: string
 }
 
-export type ListSection = {
+export type HeadingBlock = {
+  type: "heading"
+  text: string
+}
+
+export type ImageBlock = {
+  type: "image"
+  src: string
+  alt?: string
+}
+
+export type ListBlock = {
   type: "list"
-  title: string
   items: string[]
 }
 
-export type Section = TextSection | ListSection
+export type Block =
+  | ParagraphBlock
+  | HeadingBlock
+  | ImageBlock
+  | ListBlock
 
 export type Page = {
+  slug: string
   title: string
-  sections: Section[]
+  excerpt?: string
+  content: Block[]
+  seo?: {
+    title: string
+    description: string
+  }
 }
