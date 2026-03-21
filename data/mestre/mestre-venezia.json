@@ -1,0 +1,45 @@
+{
+  "slug": "mestre-e-venezia",
+  "title": "Mestre e Venezia",
+  "excerpt": "Il rapporto storico tra Mestre e Venezia, unite amministrativamente e simbolicamente dal Ponte della Libertà.",
+  "content": [
+    {
+      "type": "heading",
+      "text": "Un rapporto simbiotico"
+    },
+    {
+      "type": "paragraph",
+      "text": "Non è possibile parlare di Mestre senza un accenno a Venezia, la città antica alla quale è legata da secoli da un rapporto simbiotico e inevitabile."
+    },
+    {
+      "type": "paragraph",
+      "text": "Oltre che costituire dal 1926 un’unica realtà amministrativa, Mestre e Venezia sono di fatto una città unica, la cui comprensione non è però affatto scontata."
+    },
+
+    {
+      "type": "heading",
+      "text": "Il Ponte della Libertà"
+    },
+    {
+      "type": "paragraph",
+      "text": "Il Ponte della Libertà è il simbolo di questa contraddizione, insieme metafora di unione e separazione. Dal ponte si ha un’idea piuttosto chiara di come lo specchio d’acqua lagunare che divide le due realtà sia un vero e proprio centro trafficato di imbarcazioni, treni, automobili e aerei."
+    },
+    {
+      "type": "paragraph",
+      "text": "Il ponte è costituito da tre sezioni parallele: la prima ferroviaria, costruita su progetto di Tommaso Meduna tra il 1841 e il 1846; la seconda stradale, costruita su progetto di Eugenio Miozzi tra il 1931 e il 1933; la terza, risalente alla metà degli anni Settanta, rappresenta il raddoppio dei binari ferroviari."
+    },
+
+    {
+      "type": "heading",
+      "text": "Memoria storica"
+    },
+    {
+      "type": "paragraph",
+      "text": "A metà del ponte una stele e due cannoni ricordano l'insurrezione antiaustriaca del 1848, episodio significativo della storia locale."
+    }
+  ],
+  "seo": {
+    "title": "Mestre e Venezia - Un rapporto storico",
+    "description": "Scopri il legame storico tra Mestre e Venezia e il significato del Ponte della Libertà."
+  }
+}
