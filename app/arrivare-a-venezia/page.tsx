@@ -50,7 +50,7 @@ export default function ArrivareAVenezia() {
         <div className="bg-white rounded-2xl border border-venice-border shadow-sm p-6">
           <p className="leading-relaxed text-gray-700">
             Non è possibile guidare nel centro storico di Venezia. Lascia
-            l’auto a terraferma, nei parcheggi ufficiali a:
+            l’auto o nella vicina Mestre la terraferma Veneziana , nei parcheggi ufficiali a Venezia che sono situati a:
           </p>
              <ParcheggiareAVenezia />
           <p className="mt-4 leading-relaxed text-gray-700">
