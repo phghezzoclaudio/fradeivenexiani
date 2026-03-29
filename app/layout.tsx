@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Venezia App",
+  title: "FradeiVenexiani App",
   description: "Creazione di FradeiVenexiani un app per raccontare Venezia e il suo territorio",
 };
 
