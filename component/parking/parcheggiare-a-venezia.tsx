@@ -34,7 +34,7 @@ export default function ParcheggiareAVenezia() {
     ],
     Tronchetto: [
       {
-        nome: "Venezia Center Parking Garage",
+        nome: "Interparking - Venezia Center Parking Garage",
         dettagli:
           "Parcheggio coperto sotterraneo, accesso diretto dal Ponte della Libertà.",
         percorso:
@@ -45,7 +45,7 @@ export default function ParcheggiareAVenezia() {
         dettagli:
           "Parcheggio economico e comodo per visitare la città o partire in crociera.",
         percorso:
-          "🚶‍♂️ 8 min a piedi\n🛥 Vaporetto Linea 2\n⏱ Tempo stimato: 18 min",
+          "🚶‍♂️ 10 min a piedi\n🛥 Vaporetto Linea 2\n⏱ Tempo stimato: 18 min",
       },
     ],
   };
