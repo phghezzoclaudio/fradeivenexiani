@@ -5,7 +5,7 @@
   "scripts": {
     "convert-gpx": "node scripts/convert-gpx.js",
     "update-gtfs": "node scripts/update-gtfs.js",
-    "dev": "npm run update-gtfs && next dev",
+    "dev": "npm run convert-gpx && npm run update-gtfs && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
