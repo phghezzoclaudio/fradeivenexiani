@@ -20,6 +20,13 @@
   "description": "Un percorso che parte da Venezia e si snoda lungo la costa nord della laguna. In lontananza si possono ammirare le isole di Murano, Burano e Torcello.",
   "difficulty": "facile"
  },
+  {
+  "slug": "Caorle-Punta Sabbioni",
+  "name": "Caorle - Punta Sabbioni",
+  "distance": 38,
+  "description": "",
+  "difficulty": "medio"
+ },
  {
   "slug": "E05-Isole-di-Venezia-venezia-chioggia",
   "name": "E05 Isole di Venezia Venezia → Chioggia",
